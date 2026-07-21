@@ -11,7 +11,7 @@ const validPayload = {
     company: "POTB",
     system: "LakbayHub/POTB",
     module: "Partner Management",
-    issue_type: "BUG_FIX",
+    issue_type: "BUG",
     tester: "Byron",
   },
   test_cases: [

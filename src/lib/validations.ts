@@ -4,7 +4,6 @@ export const companySchema = z.enum(["POTB", "GLADEX"]);
 
 export const issueTypeSchema = z.enum([
   "BUG",
-  "BUG_FIX",
   "FEATURE",
   "IMPROVEMENT",
   "CHANGE_REQUEST",
@@ -41,6 +40,7 @@ export const ticketInputSchema = z.object({
   module: z.string().trim().min(1, "Module is required"),
   issue_type: issueTypeSchema,
   tester: z.string().trim().min(1, "Tester is required"),
+  dev: z.string().trim().min(1).optional(),
   // Optional: for backfilling historical tickets whose status/retry count
   // are already known (e.g. a prior spreadsheet), rather than letting the
   // normal rollup compute them from the imported test cases. When either is

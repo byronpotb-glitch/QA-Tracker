@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
-import { tickets, testCases } from "@/db/schema";
+import { tickets, testCases, testCaseHistory } from "@/db/schema";
 import {
   ticketInputSchema,
   testCaseInputSchema,
@@ -255,11 +255,82 @@ export async function setTicketStatus(
     return { error: "Enable manual override to set status manually." };
   }
 
+  const enteringFailed = parsed.data === "FAILED" && ticket.ticketStatus !== "FAILED";
+
   await db
     .update(tickets)
-    .set({ ticketStatus: parsed.data, updatedAt: new Date() })
+    .set({
+      ticketStatus: parsed.data,
+      failedCounter: enteringFailed ? ticket.failedCounter + 1 : ticket.failedCounter,
+      updatedAt: new Date(),
+    })
     .where(eq(tickets.id, ticketId));
 
+  revalidatePath(`/tickets/${ticketId}`);
+  revalidatePath("/tickets");
+  return { error: null };
+}
+
+export async function setTicketDev(
+  ticketId: string,
+  dev: string
+): Promise<ActionResult> {
+  const trimmed = dev.trim();
+
+  await db
+    .update(tickets)
+    .set({ dev: trimmed === "" ? null : trimmed, updatedAt: new Date() })
+    .where(eq(tickets.id, ticketId));
+
+  revalidatePath(`/tickets/${ticketId}`);
+  revalidatePath("/tickets");
+  return { error: null };
+}
+
+export async function retestTicket(ticketId: string): Promise<ActionResult> {
+  const ticket = await db.query.tickets.findFirst({
+    where: eq(tickets.id, ticketId),
+    with: { testCases: true },
+  });
+  if (!ticket) {
+    return { error: "Ticket not found." };
+  }
+  if (ticket.ticketStatus !== "FAILED") {
+    return { error: "Only FAILED tickets can be retested." };
+  }
+
+  await db.transaction(async (tx) => {
+    if (ticket.testCases.length > 0) {
+      await tx.insert(testCaseHistory).values(
+        ticket.testCases.map((tc) => ({
+          testCaseId: tc.id,
+          ticketId: ticket.id,
+          round: ticket.failedCounter,
+          status: tc.status,
+          actualResult: tc.actualResult,
+          comments: tc.comments,
+          testedDate: tc.testedDate,
+          tester: tc.tester,
+        }))
+      );
+    }
+
+    for (const tc of ticket.testCases) {
+      if (tc.status !== "FAILED") continue;
+      await tx
+        .update(testCases)
+        .set({
+          status: "NOT_TESTED",
+          actualResult: null,
+          comments: null,
+          testedDate: null,
+          updatedAt: new Date(),
+        })
+        .where(eq(testCases.id, tc.id));
+    }
+  });
+
+  await recomputeRollup(ticketId);
   revalidatePath(`/tickets/${ticketId}`);
   revalidatePath("/tickets");
   return { error: null };
@@ -294,6 +365,7 @@ export async function importTicket(
         module: ticketInput.module,
         issueType: ticketInput.issue_type,
         tester: ticketInput.tester,
+        dev: ticketInput.dev ?? null,
         ...(hasHistoricalStatus
           ? {
               ticketStatus: ticketInput.ticket_status ?? "PENDING",

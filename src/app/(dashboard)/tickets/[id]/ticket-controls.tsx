@@ -2,6 +2,7 @@
 
 import { useTransition } from "react";
 import { toast } from "sonner";
+import { RotateCcwIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -11,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { StatusBadge } from "@/lib/status";
-import { setTicketStatus, toggleManualOverride } from "../actions";
+import { retestTicket, setTicketStatus, toggleManualOverride } from "../actions";
 import type { TicketStatus } from "@/lib/validations";
 
 const STATUSES: readonly TicketStatus[] = [
@@ -48,8 +49,25 @@ export function TicketControls({
     });
   }
 
+  function handleRetest() {
+    startTransition(async () => {
+      const result = await retestTicket(ticketId);
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+      toast.success("Ticket reopened for retesting — failed test cases reset.");
+    });
+  }
+
   return (
     <div className="flex flex-wrap items-center gap-3">
+      {status === "FAILED" && (
+        <Button size="sm" onClick={handleRetest} disabled={pending}>
+          <RotateCcwIcon />
+          Retest
+        </Button>
+      )}
       {manualOverride ? (
         <Select value={status} onValueChange={handleStatusChange} disabled={pending}>
           <SelectTrigger className="w-40">

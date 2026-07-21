@@ -15,13 +15,7 @@ import { createTicket, type CreateTicketState } from "../actions";
 
 const initialState: CreateTicketState = { error: null };
 
-const ISSUE_TYPES = [
-  "BUG",
-  "BUG_FIX",
-  "FEATURE",
-  "IMPROVEMENT",
-  "CHANGE_REQUEST",
-] as const;
+const ISSUE_TYPES = ["BUG", "FEATURE", "IMPROVEMENT", "CHANGE_REQUEST"] as const;
 
 export function NewTicketForm() {
   const [state, formAction, pending] = useActionState(

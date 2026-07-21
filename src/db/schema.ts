@@ -14,7 +14,6 @@ export const companyEnum = pgEnum("company", ["POTB", "GLADEX"]);
 
 export const issueTypeEnum = pgEnum("issue_type", [
   "BUG",
-  "BUG_FIX",
   "FEATURE",
   "IMPROVEMENT",
   "CHANGE_REQUEST",
@@ -58,6 +57,7 @@ export const tickets = pgTable("tickets", {
   manualOverride: boolean("manual_override").notNull().default(false),
   failedCounter: integer("failed_counter").notNull().default(0),
   tester: text("tester").notNull(),
+  dev: text("dev"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
@@ -81,14 +81,41 @@ export const testCases = pgTable("test_cases", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+// One row per retest round: snapshots a test case's result right before a
+// Retest wipes it, so prior attempts stay visible after the row is reset.
+export const testCaseHistory = pgTable("test_case_history", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  testCaseId: uuid("test_case_id")
+    .notNull()
+    .references(() => testCases.id, { onDelete: "cascade" }),
+  ticketId: uuid("ticket_id")
+    .notNull()
+    .references(() => tickets.id, { onDelete: "cascade" }),
+  round: integer("round").notNull(),
+  status: testCaseStatusEnum("status").notNull(),
+  actualResult: text("actual_result"),
+  comments: text("comments"),
+  testedDate: date("tested_date"),
+  tester: text("tester").notNull(),
+  recordedAt: timestamp("recorded_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const ticketsRelations = relations(tickets, ({ many }) => ({
   testCases: many(testCases),
 }));
 
-export const testCasesRelations = relations(testCases, ({ one }) => ({
+export const testCasesRelations = relations(testCases, ({ one, many }) => ({
   ticket: one(tickets, {
     fields: [testCases.ticketId],
     references: [tickets.id],
+  }),
+  history: many(testCaseHistory),
+}));
+
+export const testCaseHistoryRelations = relations(testCaseHistory, ({ one }) => ({
+  testCase: one(testCases, {
+    fields: [testCaseHistory.testCaseId],
+    references: [testCases.id],
   }),
 }));
 
@@ -96,3 +123,4 @@ export type Ticket = typeof tickets.$inferSelect;
 export type NewTicket = typeof tickets.$inferInsert;
 export type TestCase = typeof testCases.$inferSelect;
 export type NewTestCase = typeof testCases.$inferInsert;
+export type TestCaseHistory = typeof testCaseHistory.$inferSelect;

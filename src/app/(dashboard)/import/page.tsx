@@ -181,6 +181,10 @@ export default function ImportPage() {
                     <dt className="text-muted-foreground">Tester</dt>
                     <dd>{String(preview.ticket.data.tester ?? "—")}</dd>
                   </div>
+                  <div>
+                    <dt className="text-muted-foreground">Dev</dt>
+                    <dd>{String(preview.ticket.data.dev ?? "—")}</dd>
+                  </div>
                 </dl>
               )}
             </div>

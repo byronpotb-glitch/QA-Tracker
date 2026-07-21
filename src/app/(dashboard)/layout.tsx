@@ -1,6 +1,4 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { signOut } from "./actions";
+import { AppSidebar } from "./app-sidebar";
 
 export default function DashboardLayout({
   children,
@@ -8,28 +6,11 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-1 flex-col">
-      <header className="border-b">
-        <div className="flex items-center justify-between px-4 py-3 sm:px-6">
-          <nav className="flex items-center gap-4 text-sm font-medium">
-            <Link href="/dashboard" className="hover:underline">
-              Dashboard
-            </Link>
-            <Link href="/tickets" className="hover:underline">
-              Tickets
-            </Link>
-            <Link href="/import" className="hover:underline">
-              Import
-            </Link>
-          </nav>
-          <form action={signOut}>
-            <Button type="submit" variant="ghost" size="sm">
-              Sign out
-            </Button>
-          </form>
-        </div>
-      </header>
-      <main className="flex flex-1 flex-col p-4 sm:p-6">{children}</main>
+    <div className="flex flex-1">
+      <AppSidebar />
+      <main className="flex-1 overflow-y-auto bg-muted/30 p-4 sm:p-6">
+        {children}
+      </main>
     </div>
   );
 }

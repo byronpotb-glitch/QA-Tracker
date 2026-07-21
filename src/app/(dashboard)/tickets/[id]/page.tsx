@@ -17,6 +17,7 @@ import {
 import { TicketControls } from "./ticket-controls";
 import { TestCaseDialog } from "./test-case-dialog";
 import { TestCaseRow } from "./test-case-row";
+import { DevField } from "./dev-field";
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   dateStyle: "medium",
@@ -32,16 +33,19 @@ export default async function TicketDetailPage({
 
   const ticket = await db.query.tickets.findFirst({
     where: eq(tickets.id, id),
-    with: { testCases: true },
+    with: { testCases: { with: { history: true } } },
   });
 
   if (!ticket) {
     notFound();
   }
 
-  const testCases = [...ticket.testCases].sort((a, b) =>
-    a.tcNumber.localeCompare(b.tcNumber, undefined, { numeric: true })
-  );
+  const testCases = [...ticket.testCases]
+    .sort((a, b) => a.tcNumber.localeCompare(b.tcNumber, undefined, { numeric: true }))
+    .map((tc) => ({
+      ...tc,
+      history: [...tc.history].sort((a, b) => a.round - b.round),
+    }));
 
   return (
     <div className="flex flex-col gap-6">
@@ -86,7 +90,13 @@ export default async function TicketDetailPage({
               <dd>{ticket.tester}</dd>
             </div>
             <div>
-              <dt className="text-muted-foreground">Failed Count</dt>
+              <dt className="text-muted-foreground">Dev</dt>
+              <dd>
+                <DevField ticketId={ticket.id} dev={ticket.dev} />
+              </dd>
+            </div>
+            <div>
+              <dt className="text-muted-foreground">Recurring Count</dt>
               <dd>{ticket.failedCounter}</dd>
             </div>
             <div>
@@ -142,7 +152,12 @@ export default async function TicketDetailPage({
                 </TableRow>
               )}
               {testCases.map((tc) => (
-                <TestCaseRow key={tc.id} ticketId={ticket.id} testCase={tc} />
+                <TestCaseRow
+                  key={tc.id}
+                  ticketId={ticket.id}
+                  testCase={tc}
+                  history={tc.history}
+                />
               ))}
             </TableBody>
           </Table>
