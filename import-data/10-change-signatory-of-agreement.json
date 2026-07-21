@@ -1,0 +1,113 @@
+{
+  "ticket": {
+    "title": "CHANGE SIGNATORY OF AGREEMENT",
+    "company": "POTB",
+    "system": "LakbayHub/POTB",
+    "module": "Admin Invoice",
+    "issue_type": "CHANGE_REQUEST",
+    "tester": "Byron",
+    "ticket_status": "PASSED",
+    "failed_counter": 0
+  },
+  "test_cases": [
+    {
+      "tc_number": "TC001",
+      "page": "Business Agreement / Invoice Action Icons",
+      "description": "Verify the generated B2B Business Agreement shows the correct signatory name and title.",
+      "priority": "HIGH",
+      "expected_result": "Signatory name displays as Michael Joe Pamintuan with title Sales Skills Development Manager under Pinoy Travel Biz Group Incorporation / First Party.",
+      "actual_result": "Generated agreement PDF shows 'Michael Joe Pamintuan' with title 'Sales Skills Development Manager' under the First Party block.",
+      "comments": "No discrepancy found between ticket requirement and PDF output.",
+      "status": "PASSED",
+      "tested_date": "2026-07-10"
+    },
+    {
+      "tc_number": "TC002",
+      "page": "Business Agreement / Invoice Action Icons",
+      "description": "Verify the correct signature image/graphic is attached to the Michael Joe Pamintuan signatory block.",
+      "priority": "HIGH",
+      "expected_result": "The signature image shown matches Michael Joe Pamintuan's actual signature, not Rachel Ann's or a placeholder.",
+      "actual_result": "First Party signature image displayed matches Michael Joe Pamintuan's actual signature.",
+      "comments": "Signature image renders clearly, no distortion or cropping observed.",
+      "status": "PASSED",
+      "tested_date": "2026-07-10"
+    },
+    {
+      "tc_number": "TC003",
+      "page": "Business Agreement / Invoice Action Icons",
+      "description": "Verify previously generated agreements (created before the fix) are not left showing the old incorrect signatory if reopened/regenerated.",
+      "priority": "MEDIUM",
+      "expected_result": "Old/archived agreements do not retain the incorrect signatory.",
+      "actual_result": "Reopened an agreement generated prior to the fix; signatory shown was the corrected one, no leftover Rachel Ann reference found.",
+      "comments": "Sir MJ to confirm if this needs to be checked again for agreements generated much earlier, outside this test's sample.",
+      "status": "PASSED",
+      "tested_date": "2026-07-10"
+    },
+    {
+      "tc_number": "TC004",
+      "page": "Business Agreement / Invoice Action Icons",
+      "description": "Verify clicking the Send User Agreement Email icon sends the agreement to the email used during partner signup/registration.",
+      "priority": "HIGH",
+      "expected_result": "The Business Agreement email is received at the exact email address shown in the Email column (signup-registered email).",
+      "actual_result": "Triggered Send User Agreement Email; confirmation payload and email received showed the correct registered signup email (e.g. corgiqal01@gmail.com matching the Email column).",
+      "comments": "Verified via DevTools Network tab payload, not just UI confirmation modal.",
+      "status": "PASSED",
+      "tested_date": "2026-07-10"
+    },
+    {
+      "tc_number": "TC005",
+      "page": "Business Agreement / Invoice Action Icons",
+      "description": "Verify the emailed agreement (via Send User Agreement Email) reflects the corrected signatory.",
+      "priority": "HIGH",
+      "expected_result": "The agreement shows Michael Joe Pamintuan, Sales Skills Development Manager, with his signature.",
+      "actual_result": "Opened the emailed agreement from Send User Agreement Email; signatory shown was Michael Joe Pamintuan with correct signature.",
+      "comments": "Same PDF template used as View Details/download version, consistent formatting.",
+      "status": "PASSED",
+      "tested_date": "2026-07-10"
+    },
+    {
+      "tc_number": "TC006",
+      "page": "Business Agreement / Invoice Action Icons",
+      "description": "Verify clicking Send Agreement to Other Email icon sends the agreement to a manually-entered email address, not the registered signup email.",
+      "priority": "HIGH",
+      "expected_result": "The Business Agreement email is received at the manually-input email address only.",
+      "actual_result": "Triggered Send Agreement to Other Email with a manually entered address; confirmation payload and email received showed only the manually input address (e.g. byronpotb@gmail.com), registered email was not cc'd.",
+      "comments": "Verified via DevTools Network tab payload as well.",
+      "status": "PASSED",
+      "tested_date": "2026-07-10"
+    },
+    {
+      "tc_number": "TC007",
+      "page": "Business Agreement / Invoice Action Icons",
+      "description": "Verify the emailed agreement (via Send Agreement to Other Email) reflects the corrected signatory.",
+      "priority": "HIGH",
+      "expected_result": "The agreement shows Michael Joe Pamintuan, Sales Skills Development Manager, with his signature.",
+      "actual_result": "Opened the emailed agreement from Send Agreement to Other Email; signatory shown was Michael Joe Pamintuan with correct signature.",
+      "comments": "Consistent with Send User Agreement Email version.",
+      "status": "PASSED",
+      "tested_date": "2026-07-10"
+    },
+    {
+      "tc_number": "TC008",
+      "page": "Business Agreement / Invoice Action Icons",
+      "description": "Verify system prevents sending when the other email field is left blank (Send Agreement to Other Email).",
+      "priority": "MEDIUM",
+      "expected_result": "System blocks the send with a validation message requiring an email input; no email is dispatched.",
+      "actual_result": "Left the other-email field blank and attempted to send; system displayed a validation message and blocked the send.",
+      "comments": "Validation message text not explicitly recorded; recommend UX to confirm wording is user-friendly.",
+      "status": "PASSED",
+      "tested_date": "2026-07-10"
+    },
+    {
+      "tc_number": "TC009",
+      "page": "Business Agreement / Invoice Action Icons",
+      "description": "Verify triggering one send icon does not affect or trigger the other, and both can be used in sequence without errors.",
+      "priority": "MEDIUM",
+      "expected_result": "Both actions complete independently and correctly, with no cross-sending or duplication errors.",
+      "actual_result": "Ran Send User Agreement Email followed by Send Agreement to Other Email in sequence; each email arrived only at its intended address with no duplication or cross-sending.",
+      "comments": "No cross-sending or duplicate email issue observed across both actions.",
+      "status": "PASSED",
+      "tested_date": "2026-07-10"
+    }
+  ]
+}

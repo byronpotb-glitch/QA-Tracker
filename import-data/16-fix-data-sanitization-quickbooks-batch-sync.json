@@ -1,0 +1,113 @@
+{
+  "ticket": {
+    "title": "FIX DATA SANITIZATION ISSUES IN QUICKBOOKS BATCH USER SYNC",
+    "company": "POTB",
+    "system": "LakbayHub/POTB",
+    "module": "Quickbooks",
+    "issue_type": "BUG_FIX",
+    "tester": "Byron",
+    "ticket_status": "PASSED",
+    "failed_counter": 1
+  },
+  "test_cases": [
+    {
+      "tc_number": "TC001",
+      "page": "QuickBooks Integration - Batch User Sync",
+      "description": "Verify total user count in LakbayHub matches QuickBooks after full batch sync.",
+      "priority": "HIGH",
+      "expected_result": "User counts match exactly; no records missing or duplicated.",
+      "actual_result": "User counts matched post-sync.",
+      "comments": "As expected",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC002",
+      "page": "QuickBooks Integration - Batch User Sync",
+      "description": "Verify legitimate special/accented characters in user fields are preserved, not stripped by sanitization.",
+      "priority": "HIGH",
+      "expected_result": "Valid special/safe characters preserved; only unsafe/invalid data stripped.",
+      "actual_result": "Special/accented characters preserved correctly.",
+      "comments": "As expected",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC003",
+      "page": "QuickBooks Integration - Batch User Sync",
+      "description": "Verify malicious/invalid input (script injection, invalid encoding) is properly sanitized without breaking sync.",
+      "priority": "HIGH",
+      "expected_result": "Unsafe content sanitized/escaped; sync does not fail or silently drop record.",
+      "actual_result": "Unsafe input handled without sync failure.",
+      "comments": "As expected",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC004",
+      "page": "QuickBooks Integration - Batch User Sync",
+      "description": "Verify re-running batch sync does not create duplicate entries for already-synced users.",
+      "priority": "HIGH",
+      "expected_result": "No duplicate record created; existing record recognized and skipped or updated in place.",
+      "actual_result": "No duplicates on re-run.",
+      "comments": "As expected",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC005",
+      "page": "QuickBooks Integration - Batch User Sync",
+      "description": "Verify users added close to/during a sync cycle are not skipped or lost due to timing issues.",
+      "priority": "MEDIUM",
+      "expected_result": "User captured in current or next sync cycle, not permanently dropped.",
+      "actual_result": "User captured in current/next cycle as expected.",
+      "comments": "As expected",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC006",
+      "page": "QuickBooks Integration - Batch User Sync",
+      "description": "Verify user records with empty/null optional fields sync without errors or record loss.",
+      "priority": "MEDIUM",
+      "expected_result": "Record syncs successfully; blank fields remain blank/null, no failure.",
+      "actual_result": "Blank fields synced without error.",
+      "comments": "As expected",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC007",
+      "page": "QuickBooks Integration - Batch User Sync",
+      "description": "Verify sanitization does not alter meaning/format of valid edge-case data (leading zeros, long names, etc).",
+      "priority": "MEDIUM",
+      "expected_result": "Values transferred with meaning intact; only unsafe characters removed.",
+      "actual_result": "Valid formatting preserved.",
+      "comments": "As expected",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC008",
+      "page": "QuickBooks Integration - Batch User Sync",
+      "description": "Verify field-level and record-level consistency between LakbayHub and QuickBooks after sync across a sample set.",
+      "priority": "HIGH",
+      "expected_result": "All fields match as expected; no unexplained discrepancies.",
+      "actual_result": "Field values consistent across systems.",
+      "comments": "As expected",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC009",
+      "page": "QuickBooks Integration - Batch User Sync",
+      "description": "Verify a deliberately problematic record fails sync gracefully with clear logging, without blocking the rest of the batch.",
+      "priority": "HIGH",
+      "expected_result": "Problematic record flagged/logged with clear reason; other valid records still sync successfully.",
+      "actual_result": "Problematic record logged; other records unaffected.",
+      "comments": "As expected",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    }
+  ]
+}

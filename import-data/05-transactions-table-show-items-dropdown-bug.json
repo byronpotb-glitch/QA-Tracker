@@ -1,0 +1,69 @@
+{
+  "ticket": {
+    "title": "TRANSACTIONS TABLE SHOW ITEMS DROPDOWN BUG",
+    "company": "POTB",
+    "system": "LakbayHub/POTB",
+    "module": "Transactions",
+    "issue_type": "BUG_FIX",
+    "tester": "Byron",
+    "ticket_status": "PASSED",
+    "failed_counter": 0
+  },
+  "test_cases": [
+    {
+      "tc_number": "TC001",
+      "page": "Transactions Table - Show Items Dropdown",
+      "description": "Verify Show Items dropdown displays all expected transaction records, including B2B partner markup entries.",
+      "priority": "HIGH",
+      "expected_result": "All transaction records, including markup entries, should appear in the dropdown.",
+      "actual_result": "All records, including B2B partner markup entries, now display correctly after the fix.",
+      "comments": "Root cause: creditBalance.js filter excluded markup-type transactions for a specific agent ID after duplication from B2B markup additions.",
+      "status": "PASSED",
+      "tested_date": null
+    },
+    {
+      "tc_number": "TC002",
+      "page": "Transactions Table - Show Items Dropdown",
+      "description": "Verify duplicate markup entries no longer appear in the dropdown after the fix.",
+      "priority": "HIGH",
+      "expected_result": "Markup entries should appear only once per transaction, with no duplicates.",
+      "actual_result": "No duplicate markup entries found; duplicates were removed as part of the fix.",
+      "comments": "Duplicate markup entries removed as part of the fix.",
+      "status": "PASSED",
+      "tested_date": null
+    },
+    {
+      "tc_number": "TC003",
+      "page": "Transactions Table - Show Items Dropdown",
+      "description": "Verify dropdown displays correctly for an agent with no markup transactions (edge case).",
+      "priority": "MEDIUM",
+      "expected_result": "Dropdown should show only standard transactions with no errors for agents without markups.",
+      "actual_result": "Dropdown displayed correctly with no markup entries, as expected.",
+      "comments": null,
+      "status": "PASSED",
+      "tested_date": null
+    },
+    {
+      "tc_number": "TC004",
+      "page": "Transactions Table - Show Items Dropdown",
+      "description": "Verify dropdown displays correctly for an agent with multiple markup entries (edge case).",
+      "priority": "MEDIUM",
+      "expected_result": "All markup entries for the agent should display correctly without omission.",
+      "actual_result": "All markup entries displayed correctly for the multi-markup agent.",
+      "comments": null,
+      "status": "PASSED",
+      "tested_date": null
+    },
+    {
+      "tc_number": "TC005",
+      "page": "Transactions Table - Show Items Dropdown",
+      "description": "Verify the previously affected agent ID's markup transactions now appear correctly after the creditBalance.js filter correction.",
+      "priority": "HIGH",
+      "expected_result": "Previously affected agent ID's markup transactions should now be visible in the dropdown.",
+      "actual_result": "Confirmed deployed and working; affected agent ID's transactions now visible.",
+      "comments": "Confirmed deployed and working.",
+      "status": "PASSED",
+      "tested_date": null
+    }
+  ]
+}

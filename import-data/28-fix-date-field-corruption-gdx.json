@@ -1,0 +1,69 @@
+{
+  "ticket": {
+    "title": "FIX DATE FIELD CORRUPTION ON GDX BOOKING LOOKUP",
+    "company": "GLADEX",
+    "system": "Domestic Landing Page",
+    "module": "Destination Booking",
+    "issue_type": "BUG_FIX",
+    "tester": "Byron",
+    "ticket_status": "IN_PROGRESS",
+    "failed_counter": 0
+  },
+  "test_cases": [
+    {
+      "tc_number": "TC001",
+      "page": "Domestic Booking Lookup - Dates Field",
+      "description": "Verify GDX 21544 (Togonon, single-day booking) renders the correct date 'Aug 14, 2026' instead of the corrupted 'Aug 14, -0,0'.",
+      "priority": "HIGH",
+      "expected_result": "Dates field displays 'Aug 14, 2026'.",
+      "actual_result": "Displayed as 'Aug 14, -0,0'.",
+      "comments": "Single-day bookings appear to trigger a null/undefined year concatenation bug.",
+      "status": "FAILED",
+      "tested_date": "2026-07-17"
+    },
+    {
+      "tc_number": "TC002",
+      "page": "Domestic Booking Lookup - Dates Field",
+      "description": "Verify GDX 21771 (Campaña, single-day booking) renders 'Jul 2, 2026' instead of 'Jul 2-0,0'.",
+      "priority": "HIGH",
+      "expected_result": "Dates field displays 'Jul 2, 2026'.",
+      "actual_result": "Displayed as 'Jul 2-0,0'.",
+      "comments": "Same single-day date bug pattern as TC001.",
+      "status": "FAILED",
+      "tested_date": "2026-07-17"
+    },
+    {
+      "tc_number": "TC003",
+      "page": "Domestic Booking Lookup - Dates Field",
+      "description": "Verify GDX 21851 (Chua, multi-day booking) renders 'Sep 15-17, 2026' instead of the incorrect 'Sep 15-Oct 2, 2026'.",
+      "priority": "HIGH",
+      "expected_result": "Dates field displays the correct end date within the same month, matching source data.",
+      "actual_result": "Displayed as 'Sep 15-Oct 2, 2026' - end date rolled into the following month.",
+      "comments": "Distinct from the single-day bug - this is a date-range calculation error.",
+      "status": "FAILED",
+      "tested_date": "2026-07-17"
+    },
+    {
+      "tc_number": "TC004",
+      "page": "Domestic Booking Lookup - Dates Field",
+      "description": "Test additional single-day bookings not previously flagged (e.g., GDX 21784 Davao, Jun 22 2026) to confirm whether the single-day date bug is isolated or affects all single-day bookings site-wide.",
+      "priority": "MEDIUM",
+      "expected_result": "All single-day bookings render correctly formatted dates with no truncated/garbled year segment.",
+      "actual_result": "Not yet tested - GDX 21784 currently returns 'Booking not found' (see TC-Tour and NotFound sheet), so its date field could not be checked.",
+      "comments": "Broader regression sweep.",
+      "status": "PENDING",
+      "tested_date": "2026-07-17"
+    },
+    {
+      "tc_number": "TC005",
+      "page": "Domestic Booking Lookup - Dates Field",
+      "description": "Verify date formatting consistency across all destinations after the fix (format should always be 'Mon D-D, YYYY' or 'Mon D, YYYY').",
+      "priority": "MEDIUM",
+      "expected_result": "No destination or booking shows an inconsistent date format post-fix.",
+      "actual_result": "Not yet re-tested; fix has not been deployed.",
+      "comments": "Final consistency pass.",
+      "status": "PENDING",
+      "tested_date": "2026-07-17"
+    }
+  ]
+}

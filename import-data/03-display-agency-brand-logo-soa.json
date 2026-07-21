@@ -1,0 +1,102 @@
+{
+  "ticket": {
+    "title": "DISPLAY AGENCY BRAND LOGO ON PREMIUM PACKAGE SOA BANNER (WEB + PDF)",
+    "company": "POTB",
+    "system": "LakbayHub/POTB",
+    "module": "SOA / Billing",
+    "issue_type": "BUG_FIX",
+    "tester": "Byron",
+    "ticket_status": "ON_HOLD",
+    "failed_counter": 2
+  },
+  "test_cases": [
+    {
+      "tc_number": "TC001",
+      "page": "Booking Confirmation SOA (Web)",
+      "description": "Verify agency brand logo displays on Booking Confirmation SOA banner (web).",
+      "priority": "HIGH",
+      "expected_result": "Agency brand logo renders correctly on the Booking Confirmation SOA banner (web).",
+      "actual_result": "Logo displayed correctly; previously failing touchpoint now confirmed fixed.",
+      "comments": "Previously FAILED touchpoint; confirmed fixed on retest.",
+      "status": "ON_HOLD",
+      "tested_date": null
+    },
+    {
+      "tc_number": "TC002",
+      "page": "Booking Confirmation SOA (PDF)",
+      "description": "Verify agency brand logo renders on generated PDF of Booking Confirmation SOA.",
+      "priority": "HIGH",
+      "expected_result": "Agency brand logo appears correctly on the generated PDF version.",
+      "actual_result": "Logo displayed correctly on PDF; previously failing touchpoint now confirmed fixed.",
+      "comments": "Previously FAILED touchpoint; confirmed fixed on retest.",
+      "status": "ON_HOLD",
+      "tested_date": null
+    },
+    {
+      "tc_number": "TC003",
+      "page": "B2B Download SOA (Web + PDF)",
+      "description": "Verify agency brand logo displays on B2B Download SOA, web and PDF.",
+      "priority": "HIGH",
+      "expected_result": "Agency brand logo renders correctly on both web and PDF versions of the B2B Download SOA.",
+      "actual_result": "Logo displayed correctly on both web and PDF.",
+      "comments": null,
+      "status": "ON_HOLD",
+      "tested_date": null
+    },
+    {
+      "tc_number": "TC004",
+      "page": "B2C Download SOA (Web + PDF)",
+      "description": "Verify agency brand logo displays on B2C Download SOA, web and PDF.",
+      "priority": "HIGH",
+      "expected_result": "Agency brand logo renders correctly on both web and PDF versions of the B2C Download SOA.",
+      "actual_result": "Logo displayed correctly on both web and PDF.",
+      "comments": null,
+      "status": "ON_HOLD",
+      "tested_date": null
+    },
+    {
+      "tc_number": "TC005",
+      "page": "Updated SOA (Web + PDF)",
+      "description": "Verify agency brand logo displays on Updated SOA, web and PDF.",
+      "priority": "HIGH",
+      "expected_result": "Agency brand logo renders correctly on both web and PDF versions of the Updated SOA.",
+      "actual_result": "Logo displayed correctly on both web and PDF.",
+      "comments": null,
+      "status": "ON_HOLD",
+      "tested_date": null
+    },
+    {
+      "tc_number": "TC006",
+      "page": "Booking Confirmation to Updated SOA",
+      "description": "Verify logo shown at Booking Confirmation remains consistent through payment into the Updated SOA.",
+      "priority": "MEDIUM",
+      "expected_result": "Same logo displays consistently across the Booking Confirmation SOA and the post-payment Updated SOA.",
+      "actual_result": "Logo remained consistent across the full booking-to-payment flow.",
+      "comments": "Same logo persisted across full booking-to-payment flow.",
+      "status": "ON_HOLD",
+      "tested_date": null
+    },
+    {
+      "tc_number": "TC007",
+      "page": "Updated SOA (Web + PDF)",
+      "description": "Verify a logo change made mid-flow (after confirmation, before payment) propagates to the Updated SOA.",
+      "priority": "HIGH",
+      "expected_result": "Updated SOA reflects the new logo uploaded mid-flow, since it pulls the current logo at generation time.",
+      "actual_result": "Updated SOA correctly reflected the new logo after mid-flow change.",
+      "comments": "Assumed SOA reflects current logo at generation time, not a booking-time snapshot; recommend confirming intended behavior with dev/Sir MJ.",
+      "status": "ON_HOLD",
+      "tested_date": null
+    },
+    {
+      "tc_number": "TC008",
+      "page": "Booking Confirmation SOA (Web + PDF)",
+      "description": "Verify Booking Confirmation SOA is unaffected by a logo change made after it was generated.",
+      "priority": "MEDIUM",
+      "expected_result": "Booking Confirmation SOA retains the original logo shown at generation, unaffected by later changes.",
+      "actual_result": "Confirmation SOA retained original logo as expected.",
+      "comments": "Confirmation SOA retained original logo as expected.",
+      "status": "ON_HOLD",
+      "tested_date": null
+    }
+  ]
+}

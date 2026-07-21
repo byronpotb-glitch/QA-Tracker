@@ -1,0 +1,80 @@
+{
+  "ticket": {
+    "title": "UPDATE SERVICE URL CONFIGURATION FROM LOCALHOST TO DEPLOYED QUICKBOOKS SERVICE URL",
+    "company": "POTB",
+    "system": "LakbayHub/POTB",
+    "module": "Quickbooks",
+    "issue_type": "BUG_FIX",
+    "tester": "Byron",
+    "ticket_status": "PASSED",
+    "failed_counter": 1
+  },
+  "test_cases": [
+    {
+      "tc_number": "TC001",
+      "page": "QuickBooks Integration - Service Configuration",
+      "description": "Verify QuickBooks-dependent operations (user sync, invoice creation, etc.) complete successfully in the deployed/test environment.",
+      "priority": "HIGH",
+      "expected_result": "Action completes successfully with no connection refused/timeout errors; corresponding record appears in QuickBooks.",
+      "actual_result": "No connection errors; records appeared in QuickBooks",
+      "comments": "As expected",
+      "status": "PASSED",
+      "tested_date": "2026-07-15"
+    },
+    {
+      "tc_number": "TC002",
+      "page": "QuickBooks Integration - Service Configuration",
+      "description": "Confirm no error messages, logs, or failed requests reference localhost or 127.0.0.1 as the target service URL.",
+      "priority": "HIGH",
+      "expected_result": "No localhost references appear in any user-facing error output; failures (if any) reference the deployed service.",
+      "actual_result": "No localhost references in error output",
+      "comments": "As expected",
+      "status": "PASSED",
+      "tested_date": "2026-07-15"
+    },
+    {
+      "tc_number": "TC003",
+      "page": "QuickBooks Integration - Service Configuration",
+      "description": "Verify previously passing QuickBooks features (batch user sync, invoice creation, historical sync) still function correctly after the URL configuration change.",
+      "priority": "HIGH",
+      "expected_result": "All previously passing behavior continues to work correctly against the new service URL.",
+      "actual_result": "Batch sync, invoicing, and historical sync still functioning",
+      "comments": "As expected",
+      "status": "PASSED",
+      "tested_date": "2026-07-15"
+    },
+    {
+      "tc_number": "TC004",
+      "page": "QuickBooks Integration - Service Configuration",
+      "description": "Verify the deployed service URL points to the correct environment (no cross-environment leakage).",
+      "priority": "HIGH",
+      "expected_result": "Data is synced to the correct, intended QuickBooks environment only.",
+      "actual_result": "Data synced to correct environment only",
+      "comments": "As expected",
+      "status": "PASSED",
+      "tested_date": "2026-07-15"
+    },
+    {
+      "tc_number": "TC005",
+      "page": "QuickBooks Integration - Service Configuration",
+      "description": "Verify graceful failure handling if the deployed service URL is temporarily unreachable.",
+      "priority": "MEDIUM",
+      "expected_result": "A clear, user-understandable error is shown or logged; no silent failure or application crash.",
+      "actual_result": "Failures handled gracefully with clear logging",
+      "comments": "As expected",
+      "status": "PASSED",
+      "tested_date": "2026-07-15"
+    },
+    {
+      "tc_number": "TC006",
+      "page": "QuickBooks Integration - Service Configuration",
+      "description": "Verify all QuickBooks-dependent modules (user sync, invoice sync, historical sync, EventBridge cron job) consistently use the same updated deployed service URL.",
+      "priority": "HIGH",
+      "expected_result": "All modules consistently connect to the correct deployed URL; none fail due to a stale localhost reference.",
+      "actual_result": "All modules consistently reaching the deployed URL",
+      "comments": "As expected",
+      "status": "PASSED",
+      "tested_date": "2026-07-15"
+    }
+  ]
+}

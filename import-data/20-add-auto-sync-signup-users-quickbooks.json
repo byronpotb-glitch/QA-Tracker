@@ -1,0 +1,91 @@
+{
+  "ticket": {
+    "title": "ADD AUTO-SYNC OF SIGNUP USERS TO QUICKBOOKS ON REGISTRATION",
+    "company": "POTB",
+    "system": "LakbayHub/POTB",
+    "module": "Quickbooks",
+    "issue_type": "FEATURE",
+    "tester": "Byron",
+    "ticket_status": "IN_PROGRESS",
+    "failed_counter": 1
+  },
+  "test_cases": [
+    {
+      "tc_number": "TC001",
+      "page": "Signups",
+      "description": "Verify that completing the Partner With Us signup form and payment automatically creates a matching customer record in QuickBooks.",
+      "priority": "HIGH",
+      "expected_result": "A new customer record appears in QuickBooks once the LakbayHub account is created, with fields matching the signup data.",
+      "actual_result": "Account synced to QuickBooks automatically after payment as expected.",
+      "comments": null,
+      "status": "PASSED",
+      "tested_date": "2026-07-15"
+    },
+    {
+      "tc_number": "TC002",
+      "page": "Signups",
+      "description": "Verify synced fields (name, email, company name, etc.) match exactly across the signup form, LakbayHub, and QuickBooks.",
+      "priority": "HIGH",
+      "expected_result": "All fields match exactly with no truncation, mismatch, or missing data.",
+      "actual_result": "Company Name field match between LakbayHub and QuickBooks.",
+      "comments": "Already fixed",
+      "status": "PASSED",
+      "tested_date": "2026-07-15"
+    },
+    {
+      "tc_number": "TC003",
+      "page": "Signups",
+      "description": "Verify no QuickBooks record is created if the partner abandons the signup flow before completing payment.",
+      "priority": "HIGH",
+      "expected_result": "No customer record is created in QuickBooks since the account was never finalized in LakbayHub.",
+      "actual_result": "No QuickBooks record created for incomplete/unpaid signups, as expected.",
+      "comments": null,
+      "status": "PASSED",
+      "tested_date": "2026-07-15"
+    },
+    {
+      "tc_number": "TC004",
+      "page": "Signups",
+      "description": "Verify the system does not create duplicate QuickBooks records for an email already registered as a partner.",
+      "priority": "HIGH",
+      "expected_result": "System blocks the duplicate signup, or does not create a second duplicate customer record in QuickBooks.",
+      "actual_result": "No duplicate customer record created for existing partner email.",
+      "comments": null,
+      "status": "PASSED",
+      "tested_date": "2026-07-15"
+    },
+    {
+      "tc_number": "TC005",
+      "page": "Signups",
+      "description": "Verify QuickBooks sync behavior when the partner's email remains unverified after signup and payment.",
+      "priority": "MEDIUM",
+      "expected_result": "Sync behavior matches intended design for unverified email accounts.",
+      "actual_result": "Sync proceeds as expected regardless of email verification status.",
+      "comments": null,
+      "status": "PASSED",
+      "tested_date": "2026-07-15"
+    },
+    {
+      "tc_number": "TC006",
+      "page": "Signups",
+      "description": "Verify special characters in Name/Profession/Facebook Link fields sync correctly to QuickBooks without corruption.",
+      "priority": "MEDIUM",
+      "expected_result": "Special characters are preserved accurately in QuickBooks with no encoding errors.",
+      "actual_result": "Special characters synced correctly with no corruption.",
+      "comments": null,
+      "status": "PASSED",
+      "tested_date": "2026-07-15"
+    },
+    {
+      "tc_number": "TC007",
+      "page": "Signups",
+      "description": "Verify that once a partner completes signup and pays online, the account is automatically added to LakbayHub and automatically synced to QuickBooks with no manual step required.",
+      "priority": "HIGH",
+      "expected_result": "Account is automatically added to LakbayHub and automatically synced to QuickBooks immediately after payment, with no manual intervention needed.",
+      "actual_result": "After payment, QuickBooks sync does not fire automatically. The user must first edit their info and save before the record is pushed to QuickBooks.",
+      "comments": "Sync depends on manual edit+save action post-payment; defeats the purpose of true auto-sync on registration.",
+      "status": "FAILED",
+      "tested_date": "2026-07-15"
+    }
+  ]
+}

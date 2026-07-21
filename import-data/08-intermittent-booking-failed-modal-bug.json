@@ -1,0 +1,47 @@
+{
+  "ticket": {
+    "title": "INTERMITTENT \"BOOKING FAILED\" MODAL BUG",
+    "company": "POTB",
+    "system": "LakbayHub/POTB",
+    "module": "Premium Package",
+    "issue_type": "BUG",
+    "tester": "Byron",
+    "ticket_status": "PASSED",
+    "failed_counter": 1
+  },
+  "test_cases": [
+    {
+      "tc_number": "TC001",
+      "page": "Booking Flow - Confirmation Modal",
+      "description": "Verify booking confirmation modal correctly reflects success when API returns HTTP 200.",
+      "priority": "HIGH",
+      "expected_result": "Modal should display a success state when the API returns HTTP 200.",
+      "actual_result": "Modal showed a failure state despite HTTP 200 response; reproduced twice, then became non-reproducing.",
+      "comments": "Reproduced twice consistently, then became non-reproducing. Backend confirmed booking succeeded despite frontend showing failure.",
+      "status": "PASSED",
+      "tested_date": "2026-07-09"
+    },
+    {
+      "tc_number": "TC002",
+      "page": "Booking Flow - Confirmation Modal",
+      "description": "Verify booking appears correctly in the bookings list even when the frontend shows a failure modal.",
+      "priority": "HIGH",
+      "expected_result": "Booking should appear in the bookings list regardless of the frontend modal state, if backend succeeded.",
+      "actual_result": "Booking confirmed present in bookings list despite frontend showing a failure modal.",
+      "comments": "Confirmed via bookings list; backend state was correct despite the frontend error.",
+      "status": "PASSED",
+      "tested_date": "2026-07-09"
+    },
+    {
+      "tc_number": "TC003",
+      "page": "Booking Flow - Confirmation Modal",
+      "description": "Verify modal behavior under slow network/high latency conditions (suspected trigger for frontend/backend state mismatch).",
+      "priority": "MEDIUM",
+      "expected_result": "Modal should correctly reflect final booking state even under slow network/high latency conditions.",
+      "actual_result": "Not yet tested; suspected trigger condition, pending formal ticket.",
+      "comments": "Formal bug ticket to be written",
+      "status": "PASSED",
+      "tested_date": "2026-07-09"
+    }
+  ]
+}

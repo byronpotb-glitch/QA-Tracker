@@ -1,0 +1,168 @@
+{
+  "ticket": {
+    "title": "ENHANCEMENT OF MANUAL INVOICE",
+    "company": "POTB",
+    "system": "LakbayHub/POTB",
+    "module": "Admin Invoice",
+    "issue_type": "IMPROVEMENT",
+    "tester": "Byron",
+    "ticket_status": "PASSED",
+    "failed_counter": 2
+  },
+  "test_cases": [
+    {
+      "tc_number": "TC001",
+      "page": "Admin Invoice",
+      "description": "Verify superadmin account has access to the edit button on admin invoice.",
+      "priority": "HIGH",
+      "expected_result": "Edit button is visible and clickable for superadmin.",
+      "actual_result": "Edit button rendered and was clickable for the superadmin account, as expected.",
+      "comments": "No issues found.",
+      "status": "PASSED",
+      "tested_date": "2026-07-10"
+    },
+    {
+      "tc_number": "TC002",
+      "page": "Admin Invoice",
+      "description": "Verify a non-superadmin account explicitly registered/whitelisted by Mark also has edit access.",
+      "priority": "HIGH",
+      "expected_result": "Edit button is visible and clickable for the whitelisted account.",
+      "actual_result": "Whitelisted non-superadmin account was able to view and click the edit button as expected.",
+      "comments": "Confirms whitelist permission is honored correctly.",
+      "status": "PASSED",
+      "tested_date": "2026-07-10"
+    },
+    {
+      "tc_number": "TC003",
+      "page": "Admin Invoice",
+      "description": "Verify a regular admin/non-whitelisted account does NOT have access to the edit button.",
+      "priority": "HIGH",
+      "expected_result": "Edit button is not visible or is disabled/hidden for this account.",
+      "actual_result": "Edit button was hidden/disabled for the non-whitelisted account; no edit action available via UI.",
+      "comments": "UI-level restriction working as expected.",
+      "status": "PASSED",
+      "tested_date": "2026-07-10"
+    },
+    {
+      "tc_number": "TC004",
+      "page": "Admin Invoice",
+      "description": "Verify an authorized user can successfully edit the invoice description (happy path).",
+      "priority": "HIGH",
+      "expected_result": "Description updates successfully and the new value is reflected on the invoice view.",
+      "actual_result": "Description was updated and the new value displayed correctly on the invoice view after save.",
+      "comments": "No issues found.",
+      "status": "PASSED",
+      "tested_date": "2026-07-10"
+    },
+    {
+      "tc_number": "TC005",
+      "page": "Admin Invoice",
+      "description": "Verify an authorized user can successfully edit the invoice payment date (happy path).",
+      "priority": "HIGH",
+      "expected_result": "Payment date updates successfully and reflects correctly in the Payment Date column.",
+      "actual_result": "Payment date was updated and reflected correctly in the Payment Date column.",
+      "comments": "No issues found.",
+      "status": "PASSED",
+      "tested_date": "2026-07-10"
+    },
+    {
+      "tc_number": "TC006",
+      "page": "Admin Invoice",
+      "description": "Verify Payment Date column shows the correct date for manually paid invoices.",
+      "priority": "HIGH",
+      "expected_result": "Payment Date column shows the correct, accurate payment date for the manual payment.",
+      "actual_result": "Payment Date column displayed the correct payment date matching the manual payment record.",
+      "comments": "No issues found.",
+      "status": "PASSED",
+      "tested_date": "2026-07-10"
+    },
+    {
+      "tc_number": "TC007",
+      "page": "Admin Invoice",
+      "description": "Verify Payment Date column shows the correct date for online-paid invoices.",
+      "priority": "HIGH",
+      "expected_result": "Payment Date column shows the correct, accurate payment date for the online payment, consistent with manual payment display.",
+      "actual_result": "Payment Date column displayed the correct online payment date, consistent with the manual payment display format.",
+      "comments": "Behavior consistent across payment types.",
+      "status": "PASSED",
+      "tested_date": "2026-07-10"
+    },
+    {
+      "tc_number": "TC008",
+      "page": "Admin Invoice",
+      "description": "Verify system behavior when description is cleared and saved (empty/blank field validation).",
+      "priority": "MEDIUM",
+      "expected_result": "System blocks save with a validation message, or handles blank description per defined business rule. No crash or broken UI.",
+      "actual_result": "System handled the blank description per the defined business rule; no crash or broken UI encountered.",
+      "comments": "No issues found.",
+      "status": "PASSED",
+      "tested_date": "2026-07-10"
+    },
+    {
+      "tc_number": "TC009",
+      "page": "Admin Invoice",
+      "description": "Verify system handles edge-case date values (e.g. future date, invalid format) for Payment Date edit.",
+      "priority": "HIGH",
+      "expected_result": "System validates input appropriately - rejects invalid dates with a clear message or accepts valid future dates. No system error or crash.",
+      "actual_result": "System validated edge-case date inputs appropriately; no system error or crash occurred.",
+      "comments": "No issues found.",
+      "status": "PASSED",
+      "tested_date": "2026-07-10"
+    },
+    {
+      "tc_number": "TC010",
+      "page": "Admin Invoice",
+      "description": "Verify a non-authorized user cannot edit invoice by bypassing UI (e.g. direct link, dev tools, replayed request) even if edit button is hidden.",
+      "priority": "HIGH",
+      "expected_result": "System blocks the edit action server-side and returns an appropriate access-denied response.",
+      "actual_result": "Replayed PATCH request from a non-whitelisted account's session was rejected server-side with an access-denied response; the invoice description was not modified.",
+      "comments": "Server-side enforcement confirmed independent of UI restriction.",
+      "status": "PASSED",
+      "tested_date": "2026-07-10"
+    },
+    {
+      "tc_number": "TC011",
+      "page": "Admin Invoice",
+      "description": "Verify description field properly handles special characters and long text input.",
+      "priority": "HIGH",
+      "expected_result": "Description saves and displays correctly without breaking layout, encoding issues, or script execution.",
+      "actual_result": "Description field accepted special characters and long text input; saved and displayed correctly with no layout breakage or encoding issues.",
+      "comments": "No script execution observed; input handled safely.",
+      "status": "PASSED",
+      "tested_date": "2026-07-10"
+    },
+    {
+      "tc_number": "TC012",
+      "page": "Admin Invoice",
+      "description": "Verify the edit button also shows on invoices paid via online payment (not just manual) for authorized users.",
+      "priority": "HIGH",
+      "expected_result": "Edit button is visible and clickable on the online-paid invoice, same as on manually-paid invoices.",
+      "actual_result": "Edit button was visible and clickable on the online-paid invoice, consistent with manually-paid invoices.",
+      "comments": "No issues found.",
+      "status": "PASSED",
+      "tested_date": "2026-07-10"
+    },
+    {
+      "tc_number": "TC013",
+      "page": "Admin Invoice",
+      "description": "Verify an authorized user can edit the payment date on an invoice that was paid online.",
+      "priority": "HIGH",
+      "expected_result": "Payment date updates successfully and reflects correctly in the Payment Date column for the online-paid invoice.",
+      "actual_result": "Payment date was updated successfully and reflected correctly in the Payment Date column for the online-paid invoice.",
+      "comments": "No issues found.",
+      "status": "PASSED",
+      "tested_date": "2026-07-10"
+    },
+    {
+      "tc_number": "TC014",
+      "page": "Admin Invoice",
+      "description": "Verify that without any manual edit, the Payment Date column auto-populates correctly for a newly completed online payment.",
+      "priority": "HIGH",
+      "expected_result": "Payment Date column automatically shows the correct online payment date without requiring manual edit.",
+      "actual_result": "Payment Date column auto-populated with the correct online payment date without requiring any manual edit.",
+      "comments": "No issues found.",
+      "status": "PASSED",
+      "tested_date": "2026-07-10"
+    }
+  ]
+}

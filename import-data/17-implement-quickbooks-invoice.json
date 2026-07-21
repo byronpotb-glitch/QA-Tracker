@@ -1,0 +1,124 @@
+{
+  "ticket": {
+    "title": "IMPLEMENT QUICKBOOKS INVOICE",
+    "company": "POTB",
+    "system": "LakbayHub/POTB",
+    "module": "Quickbooks",
+    "issue_type": "BUG_FIX",
+    "tester": "Byron",
+    "ticket_status": "PASSED",
+    "failed_counter": 1
+  },
+  "test_cases": [
+    {
+      "tc_number": "TC001",
+      "page": "QuickBooks Integration - Invoice & Payment Creation",
+      "description": "Verify an invoice is created in QuickBooks when a qualifying booking/transaction completes in LakbayHub.",
+      "priority": "HIGH",
+      "expected_result": "Invoice created in QuickBooks corresponding to the LakbayHub transaction.",
+      "actual_result": "Invoice generated as expected.",
+      "comments": "As expected",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC002",
+      "page": "QuickBooks Integration - Invoice & Payment Creation",
+      "description": "Verify invoice line items (service, quantity, amount) match the booking details.",
+      "priority": "HIGH",
+      "expected_result": "All line items, quantities, and amounts match exactly.",
+      "actual_result": "Line items matched exactly.",
+      "comments": "As expected",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC003",
+      "page": "QuickBooks Integration - Invoice & Payment Creation",
+      "description": "Verify total invoice amount matches the transaction total, including taxes/fees.",
+      "priority": "HIGH",
+      "expected_result": "Totals match exactly with no rounding/calculation discrepancies.",
+      "actual_result": "No rounding/calculation discrepancies.",
+      "comments": "As expected",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC004",
+      "page": "QuickBooks Integration - Invoice & Payment Creation",
+      "description": "Verify invoice is linked to the correct existing customer record in QuickBooks.",
+      "priority": "HIGH",
+      "expected_result": "Invoice correctly linked to existing customer; no duplicate customer created.",
+      "actual_result": "No duplicate customer created.",
+      "comments": "As expected",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC005",
+      "page": "QuickBooks Integration - Invoice & Payment Creation",
+      "description": "Verify a payment made against a booking creates/applies a payment record and updates invoice status in QuickBooks.",
+      "priority": "HIGH",
+      "expected_result": "Payment recorded and applied to correct invoice; status updates accordingly (e.g., Paid).",
+      "actual_result": "Invoice status updated correctly.",
+      "comments": "As expected",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC006",
+      "page": "QuickBooks Integration - Invoice & Payment Creation",
+      "description": "Verify a partial payment updates the invoice balance without marking it fully paid.",
+      "priority": "MEDIUM",
+      "expected_result": "Invoice reflects correct remaining balance and status (Partially Paid), not fully paid.",
+      "actual_result": "Balance and status reflected correctly.",
+      "comments": "As expected",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC007",
+      "page": "QuickBooks Integration - Invoice & Payment Creation",
+      "description": "Verify re-triggering sync for an already-invoiced booking does not create a duplicate invoice.",
+      "priority": "HIGH",
+      "expected_result": "No duplicate invoice created; existing invoice recognized and left as-is.",
+      "actual_result": "No duplicates on retry.",
+      "comments": "As expected",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC008",
+      "page": "QuickBooks Integration - Invoice & Payment Creation",
+      "description": "Verify cancelled/failed bookings do not generate invoices in QuickBooks.",
+      "priority": "MEDIUM",
+      "expected_result": "No invoice created for cancelled/failed bookings.",
+      "actual_result": "No invoice generated for non-qualifying bookings.",
+      "comments": "As expected",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC009",
+      "page": "QuickBooks Integration - Invoice & Payment Creation",
+      "description": "Verify invoice creation failures (API error/timeout) are logged clearly without leaving inconsistent state.",
+      "priority": "HIGH",
+      "expected_result": "Failure logged clearly; booking not marked as successfully invoiced; retry path available.",
+      "actual_result": "Failures logged; no inconsistent state.",
+      "comments": "As expected",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC010",
+      "page": "QuickBooks Integration - Invoice & Payment Creation",
+      "description": "Verify invoice consistency between LakbayHub and QuickBooks across bookings using different in-scope payment gateways.",
+      "priority": "HIGH",
+      "expected_result": "All invoices consistent across systems regardless of payment gateway used.",
+      "actual_result": "Consistent across all in-scope payment gateways.",
+      "comments": "As expected",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    }
+  ]
+}

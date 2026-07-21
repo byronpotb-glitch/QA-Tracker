@@ -1,0 +1,69 @@
+{
+  "ticket": {
+    "title": "FIX TOUR/PACKAGE MISMATCH AND MISSING RESULTS ON GDX BOOKING LOOKUP",
+    "company": "GLADEX",
+    "system": "Domestic Landing Page",
+    "module": "Destination Booking",
+    "issue_type": "BUG_FIX",
+    "tester": "Byron",
+    "ticket_status": "IN_PROGRESS",
+    "failed_counter": 0
+  },
+  "test_cases": [
+    {
+      "tc_number": "TC001",
+      "page": "Domestic Booking Lookup - Tour/Package Field",
+      "description": "Verify GDX 21863 (Ornido, Cebu) returns Tour = 'Cebu City Tour' instead of the incorrect 'PICK-UP & DROP-OFF'.",
+      "priority": "MEDIUM",
+      "expected_result": "Tour field displays 'Cebu City Tour', matching source data.",
+      "actual_result": "Displayed 'PICK-UP & DROP-OFF' instead of 'Cebu City Tour'.",
+      "comments": null,
+      "status": "FAILED",
+      "tested_date": "2026-07-17"
+    },
+    {
+      "tc_number": "TC002",
+      "page": "Domestic Booking Lookup - Tour/Package Field",
+      "description": "Confirm with source/booking records whether GDX 21842 (Jandusay), previously unassigned a tour, is correctly resolving to 'Oslob Whaleshark Tour' or whether this is a data/display error.",
+      "priority": "MEDIUM",
+      "expected_result": "If legitimate, source tracker is updated to reflect 'Oslob Whaleshark Tour' as expected; if a display bug, Tour field is corrected to blank/unassigned.",
+      "actual_result": "Displayed 'Oslob Whaleshark Tour' where the expected tracker had no tour name on file. Not yet confirmed with booking team whether this is correct or a bug.",
+      "comments": "Needs confirmation from booking team before marking pass/fail.",
+      "status": "ON_HOLD",
+      "tested_date": "2026-07-17"
+    },
+    {
+      "tc_number": "TC003",
+      "page": "Domestic Booking Lookup - Tour/Package Field",
+      "description": "Verify GDX 21784 (Jr., Davao) returns a valid booking result instead of 'Booking not found'.",
+      "priority": "HIGH",
+      "expected_result": "Lookup resolves successfully: Destination = Davao, Dates = Jun 22, 2026, Package = Ticket Only.",
+      "actual_result": "Lookup returned 'Booking not found' for GDX 21784 + Last Name 'Jr.'.",
+      "comments": "Currently the booking cannot be retrieved at all via GDX + Last Name.",
+      "status": "FAILED",
+      "tested_date": "2026-07-17"
+    },
+    {
+      "tc_number": "TC004",
+      "page": "Domestic Booking Lookup - Tour/Package Field",
+      "description": "Verify Package field accuracy across all destinations (All-In, Tour Only, Tour + Transfer, Land Arrangement, Rebooking, Ticket Only) to ensure no other package-level mismatches exist beyond the ones already found.",
+      "priority": "MEDIUM",
+      "expected_result": "All Package values match source data across all 61 domestic bookings.",
+      "actual_result": "No Package-field mismatches found outside of the destination/date/tour bugs already logged in the other 47 tested bookings; Package field itself has not shown independent errors so far.",
+      "comments": "Broader sweep beyond the specific bugs already logged.",
+      "status": "PASSED",
+      "tested_date": "2026-07-17"
+    },
+    {
+      "tc_number": "TC005",
+      "page": "Domestic Booking Lookup - Tour/Package Field",
+      "description": "Verify GDX + Last Name matching logic does not silently fail for edge-case last names (e.g., 'Jr.', hyphenated names like 'Somera-Arrobang', or names with special characters like 'Peñaloga' and 'Valeña').",
+      "priority": "HIGH",
+      "expected_result": "All edge-case last name formats match correctly and do not produce false 'Booking not found' results.",
+      "actual_result": "Somera-Arrobang (hyphenated) and Peñaloga/Valeña (special characters) all matched correctly where destination was otherwise resolvable. Only 'Jr.' (GDX 21784) failed to match, suggesting the suffix-style last name, not the special-character handling, is the likely trigger.",
+      "comments": "Root-cause check for the GDX 21784 not-found issue - points to suffix-format last names as the likely trigger.",
+      "status": "FAILED",
+      "tested_date": "2026-07-17"
+    }
+  ]
+}

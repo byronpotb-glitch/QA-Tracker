@@ -53,7 +53,9 @@ export default async function TicketsPage({
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-4">
         <h1 className="text-lg font-semibold">Tickets</h1>
-        <Button render={<Link href="/tickets/new" />}>New Ticket</Button>
+        <Button nativeButton={false} render={<Link href="/tickets/new" />}>
+          New Ticket
+        </Button>
       </div>
 
       <TicketFilters company={params.company} status={params.status} />

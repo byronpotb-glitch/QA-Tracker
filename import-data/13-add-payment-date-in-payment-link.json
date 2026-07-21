@@ -1,0 +1,102 @@
+{
+  "ticket": {
+    "title": "ADD PAYMENT DATE IN PAYMENT LINK (MANUAL PAYMENT)",
+    "company": "POTB",
+    "system": "LakbayHub/POTB",
+    "module": "Payment Link",
+    "issue_type": "FEATURE",
+    "tester": "Byron",
+    "ticket_status": "PASSED",
+    "failed_counter": 0
+  },
+  "test_cases": [
+    {
+      "tc_number": "TC001",
+      "page": "Payment Link - Manual Payment Modal",
+      "description": "Verify the new Payment Date field appears on the Manual Payment form, separate from Reference Number and Proof of Payment.",
+      "priority": "HIGH",
+      "expected_result": "A 'Payment Date' field (date picker) is visible on the Manual Payment form.",
+      "actual_result": "Payment Date field shows up clearly on the Manual Payment form, sitting separately from Reference Number and Proof of Payment.",
+      "comments": "Field is easy to spot, no layout issues.",
+      "status": "PASSED",
+      "tested_date": "2026-07-13"
+    },
+    {
+      "tc_number": "TC002",
+      "page": "Payment Link - Manual Payment Modal",
+      "description": "Verify a user can select a date earlier than today (reflecting the actual customer payment date).",
+      "priority": "HIGH",
+      "expected_result": "Selected past date is accepted and saved as the Payment Date with no validation error.",
+      "actual_result": "Picked an earlier date from the calendar and the form went through without any validation error.",
+      "comments": "Calendar allowed backdating without pushback.",
+      "status": "PASSED",
+      "tested_date": "2026-07-13"
+    },
+    {
+      "tc_number": "TC003",
+      "page": "Payment Link - Manual Payment Modal",
+      "description": "Verify the manually-entered Payment Date, not the submission date, populates the Sales Tracker.",
+      "priority": "HIGH",
+      "expected_result": "Sales Tracker shows the selected Payment Date, not the actual submission date.",
+      "actual_result": "The Sales Tracker picked up the date entered on the form, not the day it was actually submitted.",
+      "comments": "Matches the whole point of the ticket — fixes the mismatched sales tracker dates.",
+      "status": "PASSED",
+      "tested_date": "2026-07-13"
+    },
+    {
+      "tc_number": "TC004",
+      "page": "Payment Link - Manual Payment Modal",
+      "description": "Verify the system prevents selection of a future date as the Payment Date.",
+      "priority": "MEDIUM",
+      "expected_result": "Future dates are disabled or rejected; form does not submit successfully with a future date.",
+      "actual_result": "Tried picking a date ahead of today and the calendar wouldn't let it go through.",
+      "comments": "Restriction is in place on the front end.",
+      "status": "PASSED",
+      "tested_date": "2026-07-13"
+    },
+    {
+      "tc_number": "TC005",
+      "page": "Payment Link - Manual Payment Modal",
+      "description": "Verify the form cannot be submitted without a Payment Date.",
+      "priority": "MEDIUM",
+      "expected_result": "Form displays a validation error requiring Payment Date before submission proceeds.",
+      "actual_result": "Left the field blank and tried to submit — it wouldn't go through until a date was set.",
+      "comments": "Required field behaving as expected.",
+      "status": "PASSED",
+      "tested_date": "2026-07-13"
+    },
+    {
+      "tc_number": "TC006",
+      "page": "Payment Link - Manual Payment Modal",
+      "description": "Verify the entered Payment Date is reflected back to the user accurately after submission.",
+      "priority": "HIGH",
+      "expected_result": "Displayed Payment Date matches exactly what was selected.",
+      "actual_result": "Set the date to 7/18/2026 and it saved back exactly as 7/18/2026 — no off-by-one or timezone shift.",
+      "comments": "Double-checked against the saved record to be sure.",
+      "status": "PASSED",
+      "tested_date": "2026-07-13"
+    },
+    {
+      "tc_number": "TC007",
+      "page": "Payment Link - Manual Payment Modal",
+      "description": "Verify adding a separate Payment Date does not alter the existing Booking/Endorsement Date.",
+      "priority": "MEDIUM",
+      "expected_result": "Endorsement/Booking Date remains unchanged; only Payment Date reflects the new value.",
+      "actual_result": "Endorsement Date stayed the same even after setting a different Payment Date — the two fields don't touch each other.",
+      "comments": "No overlap between the two dates.",
+      "status": "PASSED",
+      "tested_date": "2026-07-13"
+    },
+    {
+      "tc_number": "TC008",
+      "page": "Payment Link - Manual Payment Modal",
+      "description": "Verify editing an existing manual payment entry allows the Payment Date to be corrected.",
+      "priority": "MEDIUM",
+      "expected_result": "Updated Payment Date saves correctly and reflects in the Sales Tracker with no duplicate or stale records.",
+      "actual_result": "Went back into an existing entry, changed the Payment Date, and the Sales Tracker updated to match — no duplicate rows left behind.",
+      "comments": "Editing flow holds up fine.",
+      "status": "PASSED",
+      "tested_date": "2026-07-13"
+    }
+  ]
+}

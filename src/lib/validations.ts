@@ -41,6 +41,13 @@ export const ticketInputSchema = z.object({
   module: z.string().trim().min(1, "Module is required"),
   issue_type: issueTypeSchema,
   tester: z.string().trim().min(1, "Tester is required"),
+  // Optional: for backfilling historical tickets whose status/retry count
+  // are already known (e.g. a prior spreadsheet), rather than letting the
+  // normal rollup compute them from the imported test cases. When either is
+  // present, the ticket is created with manualOverride=true so the rollup
+  // never overwrites this frozen historical value.
+  ticket_status: ticketStatusSchema.optional(),
+  failed_counter: z.number().int().min(0).optional(),
 });
 
 export const testCaseInputSchema = z.object({

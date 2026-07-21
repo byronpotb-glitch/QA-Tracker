@@ -1,0 +1,91 @@
+{
+  "ticket": {
+    "title": "FIX SIGNATURE FOR SECONDARY PARTY",
+    "company": "POTB",
+    "system": "LakbayHub/POTB",
+    "module": "Admin Invoice",
+    "issue_type": "BUG_FIX",
+    "tester": "Byron",
+    "ticket_status": "PASSED",
+    "failed_counter": 0
+  },
+  "test_cases": [
+    {
+      "tc_number": "TC001",
+      "page": "Business Agreement / Invoice Action Icons",
+      "description": "Verify the Second Party's signature appears on the generated B2B Business Agreement PDF.",
+      "priority": "HIGH",
+      "expected_result": "The Second Party signature block shows the partner's actual signup signature image, not blank.",
+      "actual_result": "Generated agreement PDF now shows the Second Party's actual signup signature image in the signature block, no longer blank.",
+      "comments": "Core fix confirmed - this was the main reported defect.",
+      "status": "PASSED",
+      "tested_date": "2026-07-10"
+    },
+    {
+      "tc_number": "TC002",
+      "page": "Business Agreement / Invoice Action Icons",
+      "description": "Verify the Second Party signature appears correctly in the agreement received via Send User Agreement Email.",
+      "priority": "HIGH",
+      "expected_result": "Second Party signature is visible and matches the partner's actual signup signature.",
+      "actual_result": "Opened the emailed agreement from Send User Agreement Email; Second Party signature displayed and matched the partner's signup signature.",
+      "comments": "Verified via actual email inbox, not just confirmation modal.",
+      "status": "PASSED",
+      "tested_date": "2026-07-10"
+    },
+    {
+      "tc_number": "TC003",
+      "page": "Business Agreement / Invoice Action Icons",
+      "description": "Verify the Second Party signature appears correctly in the agreement sent via Send Agreement to Other Email.",
+      "priority": "HIGH",
+      "expected_result": "Second Party signature is visible and matches the partner's actual signup signature.",
+      "actual_result": "Opened the emailed agreement from Send Agreement to Other Email; Second Party signature displayed and matched the partner's signup signature.",
+      "comments": "Verified via actual email inbox, not just confirmation modal.",
+      "status": "PASSED",
+      "tested_date": "2026-07-10"
+    },
+    {
+      "tc_number": "TC004",
+      "page": "Business Agreement / Invoice Action Icons",
+      "description": "Verify the signature shown in View Details matches the signature shown in the generated Business Agreement.",
+      "priority": "HIGH",
+      "expected_result": "The signature shown in View Details is identical to the Second Party signature shown in the Business Agreement.",
+      "actual_result": "Compared the signature shown in View Details against the generated agreement PDF; both were identical.",
+      "comments": "No visual discrepancy found between the two touchpoints.",
+      "status": "PASSED",
+      "tested_date": "2026-07-10"
+    },
+    {
+      "tc_number": "TC005",
+      "page": "Business Agreement / Invoice Action Icons",
+      "description": "Verify each partner's agreement shows their own signup signature, not another partner's.",
+      "priority": "HIGH",
+      "expected_result": "Each partner's agreement displays their own distinct signup signature; no cross-contamination between partner records.",
+      "actual_result": "Generated agreements for two separate partner accounts; each showed its own correct signup signature with no cross-partner mixup.",
+      "comments": "Tested with 2 distinct partner accounts to rule out record mixup.",
+      "status": "PASSED",
+      "tested_date": "2026-07-10"
+    },
+    {
+      "tc_number": "TC006",
+      "page": "Business Agreement / Invoice Action Icons",
+      "description": "Verify the Second Party signature image renders properly without distortion, cropping, or broken-image errors.",
+      "priority": "MEDIUM",
+      "expected_result": "Signature image displays clearly, correctly sized, and without visual defects.",
+      "actual_result": "Zoomed into the Second Party signature block on the PDF; image rendered clearly at correct size, no distortion or broken-image icon.",
+      "comments": "No cropping or scaling issues observed.",
+      "status": "PASSED",
+      "tested_date": "2026-07-10"
+    },
+    {
+      "tc_number": "TC007",
+      "page": "Business Agreement / Invoice Action Icons",
+      "description": "Verify the Second Party signature is identical whether the agreement is sent via Send User Agreement Email or Send Agreement to Other Email.",
+      "priority": "MEDIUM",
+      "expected_result": "Signature shown is identical in both emailed agreements - no discrepancy between the two send paths.",
+      "actual_result": "Compared the Second Party signature in the User Agreement Email version against the Other Email version; both were identical.",
+      "comments": "Consistent output regardless of which send action is used.",
+      "status": "PASSED",
+      "tested_date": "2026-07-10"
+    }
+  ]
+}

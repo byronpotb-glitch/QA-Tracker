@@ -267,6 +267,8 @@ export async function setTicketStatus(
 
 export interface ImportResult {
   error: string | null;
+  ticketId?: string;
+  title?: string;
 }
 
 export async function importTicket(
@@ -279,6 +281,9 @@ export async function importTicket(
 
   const { ticket: ticketInput, test_cases } = parsed.data;
 
+  const hasHistoricalStatus =
+    ticketInput.ticket_status !== undefined || ticketInput.failed_counter !== undefined;
+
   const ticketId = await db.transaction(async (tx) => {
     const [ticket] = await tx
       .insert(tickets)
@@ -289,6 +294,15 @@ export async function importTicket(
         module: ticketInput.module,
         issueType: ticketInput.issue_type,
         tester: ticketInput.tester,
+        ...(hasHistoricalStatus
+          ? {
+              ticketStatus: ticketInput.ticket_status ?? "PENDING",
+              failedCounter: ticketInput.failed_counter ?? 0,
+              // Freeze the imported historical status so the rollup that
+              // runs right after inserting test cases doesn't recompute it.
+              manualOverride: true,
+            }
+          : {}),
       })
       .returning({ id: tickets.id });
 
@@ -313,5 +327,5 @@ export async function importTicket(
 
   await recomputeRollup(ticketId);
   revalidatePath("/tickets");
-  redirect(`/tickets/${ticketId}`);
+  return { error: null, ticketId, title: ticketInput.title };
 }

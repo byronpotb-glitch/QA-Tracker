@@ -1,0 +1,69 @@
+{
+  "ticket": {
+    "title": "FIX INCORRECT DESTINATION RESOLUTION ON GDX BOOKING LOOKUP",
+    "company": "GLADEX",
+    "system": "Domestic Landing Page",
+    "module": "Destination Booking",
+    "issue_type": "BUG_FIX",
+    "tester": "Byron",
+    "ticket_status": "FAILED",
+    "failed_counter": 0
+  },
+  "test_cases": [
+    {
+      "tc_number": "TC001",
+      "page": "Domestic Booking Lookup - Destination Field",
+      "description": "Verify all 7 Puerto Princesa bookings (GDX 19395, 21285, 19817, 19384, 20985, 19481, 20146) resolve to Puerto Princesa, not Boracay, on the domestic booking lookup.",
+      "priority": "HIGH",
+      "expected_result": "Destination field returns 'Puerto Princesa' for all 7 bookings.",
+      "actual_result": "All 7 bookings (Severino, Toledo, Basilan, Santos, Somera-Arrobang, Mendoza, Ligayo) resolved to 'Boracay' instead of 'Puerto Princesa'. 0/7 passed.",
+      "comments": "Currently all 7 resolve to Boracay - 0/7 passed in prior cycle.",
+      "status": "FAILED",
+      "tested_date": "2026-07-17"
+    },
+    {
+      "tc_number": "TC002",
+      "page": "Domestic Booking Lookup - Destination Field",
+      "description": "Verify GDX 21954 (Burlat), expected under Boracay, resolves to Boracay and not Puerto Princesa.",
+      "priority": "HIGH",
+      "expected_result": "Destination field returns 'Boracay'.",
+      "actual_result": "Resolved to 'Puerto Princesa' instead of 'Boracay'.",
+      "comments": "Currently resolves to Puerto Princesa.",
+      "status": "FAILED",
+      "tested_date": "2026-07-17"
+    },
+    {
+      "tc_number": "TC003",
+      "page": "Domestic Booking Lookup - Destination Field",
+      "description": "Verify GDX 21851 (Chua), expected under Cebu, resolves to Cebu and not Boracay.",
+      "priority": "HIGH",
+      "expected_result": "Destination field returns 'Cebu'.",
+      "actual_result": "Resolved to 'Boracay' instead of 'Cebu'. Date field also corrupted (see TC-Date Corruption sheet).",
+      "comments": "Currently resolves to Boracay.",
+      "status": "FAILED",
+      "tested_date": "2026-07-17"
+    },
+    {
+      "tc_number": "TC004",
+      "page": "Domestic Booking Lookup - Destination Field",
+      "description": "Spot-check a sample of previously passing bookings across Boracay, El Nido, Cebu, Siargao, Bohol, and Davao to confirm the destination fix has no regression.",
+      "priority": "MEDIUM",
+      "expected_result": "All spot-checked bookings continue to resolve to their correct destination.",
+      "actual_result": "Not yet re-tested; fix has not been deployed.",
+      "comments": "Regression check after fix.",
+      "status": "FAILED",
+      "tested_date": "2026-07-17"
+    },
+    {
+      "tc_number": "TC005",
+      "page": "Domestic Booking Lookup - Destination Field",
+      "description": "Verify the underlying cause: check whether the destination-mapping logic (booking ID to destination table/lookup) has a shared root cause across the affected bookings (Boracay <-> Puerto Princesa <-> Cebu cross-contamination).",
+      "priority": "HIGH",
+      "expected_result": "Root cause identified and documented; fix should be applied at the mapping/data layer, not per-booking.",
+      "actual_result": "Not yet investigated by dev team; pattern across 3 separate destination groups suggests a shared/systemic mapping bug rather than isolated data errors.",
+      "comments": "Dev investigation - likely systemic destination ID/index mismatch.",
+      "status": "IN_PROGRESS",
+      "tested_date": "2026-07-17"
+    }
+  ]
+}

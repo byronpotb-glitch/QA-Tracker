@@ -1,0 +1,113 @@
+{
+  "ticket": {
+    "title": "IMPLEMENT BATCH SYNC OF EXISTING HISTORICAL TRANSACTIONS TO QUICKBOOKS",
+    "company": "POTB",
+    "system": "LakbayHub/POTB",
+    "module": "Quickbooks",
+    "issue_type": "FEATURE",
+    "tester": "Byron",
+    "ticket_status": "PASSED",
+    "failed_counter": 1
+  },
+  "test_cases": [
+    {
+      "tc_number": "TC001",
+      "page": "QuickBooks Integration - Historical Transaction Batch Sync",
+      "description": "Verify pre-existing historical transactions are successfully created in QuickBooks when batch-synced.",
+      "priority": "HIGH",
+      "expected_result": "All sampled historical transactions appear correctly in QuickBooks.",
+      "actual_result": "All sampled records created.",
+      "comments": "As expected",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC002",
+      "page": "QuickBooks Integration - Historical Transaction Batch Sync",
+      "description": "Verify synced historical records retain accurate data (dates, amounts, customer, line items).",
+      "priority": "HIGH",
+      "expected_result": "All fields match exactly, including original transaction dates.",
+      "actual_result": "Fields and original dates matched.",
+      "comments": "As expected",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC003",
+      "page": "QuickBooks Integration - Historical Transaction Batch Sync",
+      "description": "Verify re-running historical batch sync does not create duplicates for already-migrated records.",
+      "priority": "HIGH",
+      "expected_result": "No duplicate record created; existing record recognized and skipped.",
+      "actual_result": "No duplicates on re-run.",
+      "comments": "As expected",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC004",
+      "page": "QuickBooks Integration - Historical Transaction Batch Sync",
+      "description": "Verify historical batch sync does not disrupt or conflict with live/ongoing sync processes.",
+      "priority": "HIGH",
+      "expected_result": "No interference, corruption, or failed sync jobs on either side.",
+      "actual_result": "No conflicts with live sync processes.",
+      "comments": "As expected",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC005",
+      "page": "QuickBooks Integration - Historical Transaction Batch Sync",
+      "description": "Verify historical transactions link to correct existing customer records in QuickBooks.",
+      "priority": "HIGH",
+      "expected_result": "Transactions correctly linked; no duplicate customer records created.",
+      "actual_result": "Linked to correct existing customers.",
+      "comments": "As expected",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC006",
+      "page": "QuickBooks Integration - Historical Transaction Batch Sync",
+      "description": "Verify batch sync can process a large volume of historical transactions without timeout.",
+      "priority": "MEDIUM",
+      "expected_result": "Sync completes successfully with all records accounted for.",
+      "actual_result": "Completed without timeout or dropped records.",
+      "comments": "As expected",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC007",
+      "page": "QuickBooks Integration - Historical Transaction Batch Sync",
+      "description": "Verify cancelled/refunded historical transactions are excluded or accurately reflect true status.",
+      "priority": "MEDIUM",
+      "expected_result": "Cancelled/refunded transactions excluded or accurately reflected; not shown as valid.",
+      "actual_result": "Cancelled/refunded transactions handled correctly.",
+      "comments": "As expected",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC008",
+      "page": "QuickBooks Integration - Historical Transaction Batch Sync",
+      "description": "Verify individual failed historical records are logged clearly without blocking the rest of the batch.",
+      "priority": "HIGH",
+      "expected_result": "Problematic record flagged/logged with clear reason; other valid records still sync successfully.",
+      "actual_result": "Failures logged clearly; batch unaffected.",
+      "comments": "As expected",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC009",
+      "page": "QuickBooks Integration - Historical Transaction Batch Sync",
+      "description": "Verify overall consistency between historical transaction records in LakbayHub and QuickBooks.",
+      "priority": "HIGH",
+      "expected_result": "All fields match as expected; no unexplained discrepancies.",
+      "actual_result": "Fields consistent across systems.",
+      "comments": "As expected",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    }
+  ]
+}

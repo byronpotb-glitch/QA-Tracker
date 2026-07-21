@@ -1,0 +1,69 @@
+{
+  "ticket": {
+    "title": "INTEGRATE EXTERNAL USER API FOR AUTHENTICATION (USER MANAGEMENT)",
+    "company": "GLADEX",
+    "system": "Gladex Ezquote System",
+    "module": "Users",
+    "issue_type": "FEATURE",
+    "tester": "Byron",
+    "ticket_status": "IN_PROGRESS",
+    "failed_counter": 0
+  },
+  "test_cases": [
+    {
+      "tc_number": "TC001",
+      "page": "Login / User Management",
+      "description": "Verify user can log in using existing external API credentials without needing to create a separate Ezquote account.",
+      "priority": "HIGH",
+      "expected_result": "User successfully logs in using external API credentials; no local Ezquote account creation is required.",
+      "actual_result": null,
+      "comments": null,
+      "status": "IN_PROGRESS",
+      "tested_date": "2026-07-16"
+    },
+    {
+      "tc_number": "TC002",
+      "page": "Login / User Management",
+      "description": "Verify user's role (Admin/Agent) is correctly assigned based on the external API response after login.",
+      "priority": "HIGH",
+      "expected_result": "Correct role-based view (Admin or Agent) loads immediately after login, matching the role returned by the API.",
+      "actual_result": null,
+      "comments": null,
+      "status": "IN_PROGRESS",
+      "tested_date": "2026-07-16"
+    },
+    {
+      "tc_number": "TC003",
+      "page": "Login / User Management",
+      "description": "Verify failed login with invalid credentials shows an appropriate, clear error message.",
+      "priority": "MEDIUM",
+      "expected_result": "A specific 'invalid credentials' error is shown; user is not logged in.",
+      "actual_result": null,
+      "comments": null,
+      "status": "IN_PROGRESS",
+      "tested_date": "2026-07-16"
+    },
+    {
+      "tc_number": "TC004",
+      "page": "Login / User Management",
+      "description": "Verify login behavior when the external API is unavailable or times out.",
+      "priority": "MEDIUM",
+      "expected_result": "A clear 'service unavailable' message is shown; the app does not silently fail or hang.",
+      "actual_result": null,
+      "comments": null,
+      "status": "IN_PROGRESS",
+      "tested_date": "2026-07-16"
+    },
+    {
+      "tc_number": "TC005",
+      "page": "Login / User Management",
+      "description": "Verify branch selection and session/logout behavior continue to work correctly after login via the external API.",
+      "priority": "MEDIUM",
+      "expected_result": "Branch dropdown, session persistence, and sign-out all function normally post-integration.",
+      "actual_result": null,
+      "comments": null,
+      "status": "IN_PROGRESS",
+      "tested_date": "2026-07-16"
+    }
+  ]
+}

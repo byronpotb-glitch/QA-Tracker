@@ -1,0 +1,113 @@
+{
+  "ticket": {
+    "title": "FIX FILTERING OF ADMIN INVOICE",
+    "company": "POTB",
+    "system": "LakbayHub/POTB",
+    "module": "Admin Invoice",
+    "issue_type": "BUG_FIX",
+    "tester": "Byron",
+    "ticket_status": "PASSED",
+    "failed_counter": 1
+  },
+  "test_cases": [
+    {
+      "tc_number": "TC001",
+      "page": "Admin Invoice - All Invoices",
+      "description": "Verify selecting a start and end date on the calendar returns matching records.",
+      "priority": "HIGH",
+      "expected_result": "Start Date and End Date fields populate with the selected dates, and the table refreshes to show only invoices dated within the selected range.",
+      "actual_result": "Table displayed records within the 06/01/2026-07/11/2026 range as expected.",
+      "comments": "Filter keys off Date Created, not Payment Date - one record shown has Payment Date outside range but Date Created within range. Verified via screenshot.",
+      "status": "PASSED",
+      "tested_date": "2026-07-11"
+    },
+    {
+      "tc_number": "TC002",
+      "page": "Admin Invoice - All Invoices",
+      "description": "Verify filtering works when both start and end dates fall in the same month.",
+      "priority": "HIGH",
+      "expected_result": "Table shows only invoices dated within that same-month range.",
+      "actual_result": "Table displayed only records within 06/01/2026-06/30/2026 as expected.",
+      "comments": "Verified via screenshot showing 3 matching records.",
+      "status": "PASSED",
+      "tested_date": "2026-07-11"
+    },
+    {
+      "tc_number": "TC003",
+      "page": "Admin Invoice - All Invoices",
+      "description": "Verify filtering works when the range spans two different months.",
+      "priority": "HIGH",
+      "expected_result": "Table shows all invoices dated within the full cross-month range, not just one month.",
+      "actual_result": "Table displayed records spanning June-July range correctly.",
+      "comments": "Same evidence as TC001 (cross-month range).",
+      "status": "PASSED",
+      "tested_date": "2026-07-11"
+    },
+    {
+      "tc_number": "TC004",
+      "page": "Admin Invoice - All Invoices",
+      "description": "Verify selecting the same day twice filters to that single date.",
+      "priority": "MEDIUM",
+      "expected_result": "Table shows only invoices dated exactly on that day.",
+      "actual_result": "Table displayed only the 2 records dated exactly 06/20/2026.",
+      "comments": "Verified via screenshot showing single-day filter result.",
+      "status": "PASSED",
+      "tested_date": "2026-07-11"
+    },
+    {
+      "tc_number": "TC005",
+      "page": "Admin Invoice - All Invoices",
+      "description": "Verify a record dated exactly on the selected Start Date is included.",
+      "priority": "HIGH",
+      "expected_result": "The record on the Start Date is included in results (inclusive).",
+      "actual_result": "Record dated 06/20/2026 (Start Date) was included in the 06/20/2026-07/10/2026 range results.",
+      "comments": "Boundary check confirmed inclusive on Start Date.",
+      "status": "PASSED",
+      "tested_date": "2026-07-11"
+    },
+    {
+      "tc_number": "TC006",
+      "page": "Admin Invoice - All Invoices",
+      "description": "Verify a record dated exactly on the selected End Date is included.",
+      "priority": "HIGH",
+      "expected_result": "The record on the End Date is included in results (inclusive).",
+      "actual_result": "Record dated 07/10/2026 (End Date) was included in the 06/20/2026-07/10/2026 range results.",
+      "comments": "Boundary check confirmed inclusive on End Date.",
+      "status": "PASSED",
+      "tested_date": "2026-07-11"
+    },
+    {
+      "tc_number": "TC007",
+      "page": "Admin Invoice - All Invoices",
+      "description": "Verify correct empty-state handling when no invoices fall within the selected range.",
+      "priority": "LOW",
+      "expected_result": "Table shows 'No Data Found' / empty state, not an error or unrelated records.",
+      "actual_result": "Table correctly showed 'No Data Found' and 'Showing 0 to 0 of 0 results' for range 06/11/2026-06/11/2026.",
+      "comments": "Empty-state handled correctly, no error thrown.",
+      "status": "PASSED",
+      "tested_date": "2026-07-11"
+    },
+    {
+      "tc_number": "TC008",
+      "page": "Admin Invoice - All Invoices",
+      "description": "Verify clearing the date range restores the full unfiltered invoice list.",
+      "priority": "MEDIUM",
+      "expected_result": "Table returns to showing all invoice records as it does by default.",
+      "actual_result": "Confirmed full list restored after clearing filter.",
+      "comments": "No regressions observed after clearing filter.",
+      "status": "PASSED",
+      "tested_date": "2026-07-11"
+    },
+    {
+      "tc_number": "TC009",
+      "page": "Admin Invoice - All Invoices",
+      "description": "Verify pagination (Previous/Next, results count) reflects the filtered date range, not the full unfiltered dataset.",
+      "priority": "LOW",
+      "expected_result": "Result count and pagination reflect only the filtered records within the date range.",
+      "actual_result": "Confirmed pagination and result count matched filtered records.",
+      "comments": "Pagination count consistent with filtered dataset.",
+      "status": "PASSED",
+      "tested_date": "2026-07-11"
+    }
+  ]
+}

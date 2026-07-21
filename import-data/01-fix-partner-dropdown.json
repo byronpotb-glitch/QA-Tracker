@@ -1,0 +1,80 @@
+{
+  "ticket": {
+    "title": "FIX PARTNER DROPDOWN (MEILISEARCH QUERY ON INIT)",
+    "company": "POTB",
+    "system": "LakbayHub/POTB",
+    "module": "Partner Management",
+    "issue_type": "BUG_FIX",
+    "tester": "Byron",
+    "ticket_status": "PASSED",
+    "failed_counter": 0
+  },
+  "test_cases": [
+    {
+      "tc_number": "TC001",
+      "page": "Booking - Partner Dropdown",
+      "description": "Verify partner dropdown loads correctly on page init via Meilisearch query.",
+      "priority": "HIGH",
+      "expected_result": "Dropdown populates with the correct list of partners immediately on page load.",
+      "actual_result": "Dropdown populated correctly with partners on init.",
+      "comments": "Core fix confirmed working.",
+      "status": "PASSED",
+      "tested_date": null
+    },
+    {
+      "tc_number": "TC002",
+      "page": "Booking - Partner Dropdown",
+      "description": "Verify dropdown search/filter returns correct partners when typing a partner name.",
+      "priority": "MEDIUM",
+      "expected_result": "Typing a partner name filters the list to matching partners only.",
+      "actual_result": "Search correctly filtered and returned matching partners.",
+      "comments": null,
+      "status": "PASSED",
+      "tested_date": null
+    },
+    {
+      "tc_number": "TC003",
+      "page": "Booking - Partner Dropdown",
+      "description": "Verify parent company scoping is respected when populating the partner dropdown.",
+      "priority": "MEDIUM",
+      "expected_result": "Only partners under the correct parent company appear in the dropdown.",
+      "actual_result": "Dropdown correctly scoped to the parent company; no cross-company leakage.",
+      "comments": "Added mid-session as supplementary edge case.",
+      "status": "PASSED",
+      "tested_date": null
+    },
+    {
+      "tc_number": "TC004",
+      "page": "Booking - Partner Dropdown",
+      "description": "Verify available services matching correctly filters per selected partner.",
+      "priority": "MEDIUM",
+      "expected_result": "Selecting a partner updates the available services list to match that partner's offerings.",
+      "actual_result": "Available services correctly matched and updated per selected partner.",
+      "comments": "Added mid-session as supplementary edge case.",
+      "status": "PASSED",
+      "tested_date": null
+    },
+    {
+      "tc_number": "TC005",
+      "page": "Booking - Partner Dropdown",
+      "description": "Verify dropdown behavior when no partners match the search/scoping criteria (empty state).",
+      "priority": "LOW",
+      "expected_result": "Dropdown shows a clear empty/no-results state without breaking the UI.",
+      "actual_result": "Empty state displayed correctly with no errors.",
+      "comments": "Edge case.",
+      "status": "PASSED",
+      "tested_date": null
+    },
+    {
+      "tc_number": "TC006",
+      "page": "Booking - Partner Dropdown",
+      "description": "Verify dropdown handles special characters/partial search terms without breaking the Meilisearch query.",
+      "priority": "LOW",
+      "expected_result": "Special characters and partial terms are handled gracefully, returning relevant results or none.",
+      "actual_result": "Meilisearch query handled special characters and partial terms without errors.",
+      "comments": "Edge case.",
+      "status": "PASSED",
+      "tested_date": null
+    }
+  ]
+}

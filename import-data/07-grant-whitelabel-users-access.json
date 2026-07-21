@@ -1,0 +1,69 @@
+{
+  "ticket": {
+    "title": "GRANT WHITELABEL USERS ACCESS TO PARTNER SETTINGS TAB",
+    "company": "POTB",
+    "system": "LakbayHub/POTB",
+    "module": "Partner Management",
+    "issue_type": "FEATURE",
+    "tester": "Byron",
+    "ticket_status": "PASSED",
+    "failed_counter": 0
+  },
+  "test_cases": [
+    {
+      "tc_number": "TC001",
+      "page": "Partner Settings Tab",
+      "description": "Verify whitelabel users can access and view the Partner Settings tab.",
+      "priority": "MEDIUM",
+      "expected_result": "Whitelabel users should be able to view the Partner Settings tab.",
+      "actual_result": "Not yet tested - ticket on hold.",
+      "comments": "No longer needed",
+      "status": "PASSED",
+      "tested_date": "2026-07-09"
+    },
+    {
+      "tc_number": "TC002",
+      "page": "Partner Settings Tab",
+      "description": "Verify whitelabel users can edit/save partner settings where permitted.",
+      "priority": "MEDIUM",
+      "expected_result": "Whitelabel users should be able to edit and save permitted settings.",
+      "actual_result": "Not yet tested.",
+      "comments": "No longer needed",
+      "status": "PASSED",
+      "tested_date": "2026-07-09"
+    },
+    {
+      "tc_number": "TC003",
+      "page": "Partner Settings Tab",
+      "description": "Verify non-whitelabel users' access to the tab is unaffected (regression).",
+      "priority": "MEDIUM",
+      "expected_result": "Non-whitelabel users' existing access/behavior should remain unchanged.",
+      "actual_result": "Not yet tested.",
+      "comments": "No longer needed",
+      "status": "PASSED",
+      "tested_date": "2026-07-09"
+    },
+    {
+      "tc_number": "TC004",
+      "page": "Partner Settings Tab",
+      "description": "Verify access restrictions apply correctly for unauthorized whitelabel roles.",
+      "priority": "MEDIUM",
+      "expected_result": "Unauthorized whitelabel roles should be correctly restricted from the tab.",
+      "actual_result": "Not yet tested.",
+      "comments": "No longer needed",
+      "status": "PASSED",
+      "tested_date": "2026-07-09"
+    },
+    {
+      "tc_number": "TC005",
+      "page": "Partner Settings Tab",
+      "description": "Verify Partner Settings tab renders correctly for whitelabel users on both web and mobile.",
+      "priority": "LOW",
+      "expected_result": "Tab should render correctly and consistently across web and mobile for whitelabel users.",
+      "actual_result": "Not yet tested.",
+      "comments": "No longer needed",
+      "status": "PASSED",
+      "tested_date": "2026-07-09"
+    }
+  ]
+}

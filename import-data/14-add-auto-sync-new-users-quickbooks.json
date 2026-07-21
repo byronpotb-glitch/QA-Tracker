@@ -1,0 +1,102 @@
+{
+  "ticket": {
+    "title": "ADD AUTO-SYNC OF NEW USERS TO QUICKBOOKS ON USER CREATION",
+    "company": "POTB",
+    "system": "LakbayHub/POTB",
+    "module": "Quickbooks",
+    "issue_type": "FEATURE",
+    "tester": "Byron",
+    "ticket_status": "PASSED",
+    "failed_counter": 2
+  },
+  "test_cases": [
+    {
+      "tc_number": "TC001",
+      "page": "Admin Panel - User Creation / QuickBooks Sales - Customers & Leads",
+      "description": "Verify a newly created LakbayHub user automatically appears in QuickBooks without manual intervention.",
+      "priority": "HIGH",
+      "expected_result": "The new user automatically appears as a Customer within seconds, with no manual sync action required.",
+      "actual_result": "New user created in LakbayHub admin panel automatically appeared as a Customer in QuickBooks Sales > Customers & Leads within seconds, no manual sync triggered.",
+      "comments": "Auto-sync trigger working as expected on user creation.",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC002",
+      "page": "Admin Panel - User Creation / QuickBooks Sales - Customers & Leads",
+      "description": "Verify the synced customer record in QuickBooks accurately reflects the user's name, email, and company as entered in LakbayHub.",
+      "priority": "HIGH",
+      "expected_result": "Name, Email, and Company fields match exactly between LakbayHub and QuickBooks with no truncation, mismatches, or formatting issues.",
+      "actual_result": "New user synced to QuickBooks, name, email and company fields match exactly between lakbayhub and quickbooks",
+      "comments": "Company issue fixed",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC003",
+      "page": "Admin Panel - User Creation / QuickBooks Sales - Customers & Leads",
+      "description": "Confirm the auto-sync completes within an acceptable time window after user creation.",
+      "priority": "MEDIUM",
+      "expected_result": "User appears in QuickBooks within seconds of creation, not requiring a batch/cron cycle to complete.",
+      "actual_result": "New user appeared in QuickBooks Customers & Leads within seconds of creation in LakbayHub, consistent with real-time auto-sync behavior.",
+      "comments": "Sync timing within acceptable window.",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC004",
+      "page": "Admin Panel - User Creation / QuickBooks Sales - Customers & Leads",
+      "description": "Verify creating one new user results in exactly one QuickBooks customer record, not multiple.",
+      "priority": "MEDIUM",
+      "expected_result": "Only one matching customer record exists in QuickBooks.",
+      "actual_result": "Only one matching customer record found in QuickBooks for the newly created user; no duplicates observed.",
+      "comments": "No duplicate customer created on auto-sync.",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC005",
+      "page": "Admin Panel - User Creation / QuickBooks Sales - Customers & Leads",
+      "description": "Verify behavior when a new user is created with an invalid or missing email address.",
+      "priority": "MEDIUM",
+      "expected_result": "User is either skipped cleanly from sync or the LakbayHub form validation blocks invalid emails at creation, with no sync errors or crashes.",
+      "actual_result": "LakbayHub admin panel blocked user creation with an empty or invalid email format at the form level; user could not be created, so no record was ever sent to QuickBooks for sync.",
+      "comments": "Sync-level error handling isn't actually exercised since invalid/empty emails are rejected by LBH form validation before reaching the sync process. Noted for team awareness, not a defect.",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC006",
+      "page": "Admin Panel - User Creation / QuickBooks Sales - Customers & Leads",
+      "description": "Verify behavior when a new user is created using an email that already exists as a QuickBooks customer.",
+      "priority": "MEDIUM",
+      "expected_result": "System does not create a duplicate customer record; existing record is matched/reused or conflict handled per defined business logic.",
+      "actual_result": "Attempting to create a new user with an email already existing as a QuickBooks customer did not create a duplicate; no new customer record was added.",
+      "comments": "Existing customer/email conflict handling working as expected.",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC007",
+      "page": "Admin Panel - User Creation / QuickBooks Sales - Customers & Leads",
+      "description": "Verify users with special characters (accented letters, apostrophes, hyphens) in name or company sync correctly without corruption.",
+      "priority": "LOW",
+      "expected_result": "Special characters are preserved accurately in QuickBooks with no encoding errors or truncation.",
+      "actual_result": "New user created with special characters in name/company fields synced to QuickBooks with all characters preserved correctly, no encoding errors or truncation observed.",
+      "comments": "Special character handling confirmed working.",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC008",
+      "page": "Admin Panel - User Creation / QuickBooks Sales - Customers & Leads",
+      "description": "Verify sync integrity holds when multiple users are created in quick succession.",
+      "priority": "MEDIUM",
+      "expected_result": "All users sync individually and accurately - no drops, no merges, no duplicates.",
+      "actual_result": "LakbayHub does not have a bulk/mass user creation function. Users were created one at a time in sequence instead; each synced individually and accurately to QuickBooks with no drops, duplicates, or merges.",
+      "comments": "Bulk creation not applicable - LBH has no such function. Tested via sequential single creations instead.",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    }
+  ]
+}

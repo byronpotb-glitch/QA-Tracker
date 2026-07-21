@@ -1,0 +1,80 @@
+{
+  "ticket": {
+    "title": "CONFIGURE EVENTBRIDGE CRON JOB FOR NIGHTLY QUICKBOOKS CUSTOMER SYNC",
+    "company": "POTB",
+    "system": "LakbayHub/POTB",
+    "module": "Quickbooks",
+    "issue_type": "FEATURE",
+    "tester": "Byron",
+    "ticket_status": "PASSED",
+    "failed_counter": 0
+  },
+  "test_cases": [
+    {
+      "tc_number": "TC001",
+      "page": "Quickbooks Batch Sync / AWS EventBridge (Infra)",
+      "description": "Verify that manually triggering the batch sync endpoint correctly pushes an updated field (e.g., company name) to the matching QuickBooks customer, per dev's provided Postman test steps.",
+      "priority": "HIGH",
+      "expected_result": "The QuickBooks customer record updates to match the new value set in LakbayHub after the batch sync call.",
+      "actual_result": "API response confirmed batch sync completed with 6 users updated, 0 errors. Verified in QuickBooks that field values matched the changes made in LakbayHub.",
+      "comments": null,
+      "status": "PASSED",
+      "tested_date": "2026-07-15"
+    },
+    {
+      "tc_number": "TC002",
+      "page": "Quickbooks Batch Sync / AWS EventBridge (Infra)",
+      "description": "Verify that only users updated/created on or after the 'since' date are included in the batch sync.",
+      "priority": "MEDIUM",
+      "expected_result": "Only users updated on/after the 'since' date are synced/updated in QuickBooks; untouched users are not affected by this run.",
+      "actual_result": "All 6 returned users matched the actual set of users updated that day. No unrelated/untouched users were included.",
+      "comments": null,
+      "status": "PASSED",
+      "tested_date": "2026-07-15"
+    },
+    {
+      "tc_number": "TC003",
+      "page": "Quickbooks Batch Sync / AWS EventBridge (Infra)",
+      "description": "Verify the endpoint properly rejects requests without a valid x-api-key.",
+      "priority": "MEDIUM",
+      "expected_result": "Request is rejected with an appropriate authentication error (e.g., 401/403); no sync is triggered.",
+      "actual_result": "Request without a valid x-api-key was rejected as expected.",
+      "comments": null,
+      "status": "PASSED",
+      "tested_date": "2026-07-15"
+    },
+    {
+      "tc_number": "TC004",
+      "page": "Quickbooks Batch Sync / AWS EventBridge (Infra)",
+      "description": "Verify that calling the batch sync endpoint multiple times with overlapping 'since' ranges does not create duplicate QuickBooks records.",
+      "priority": "MEDIUM",
+      "expected_result": "No duplicate customer record is created; the existing record is updated (if changed) or left as-is.",
+      "actual_result": "No duplicate records created on repeated manual trigger.",
+      "comments": null,
+      "status": "PASSED",
+      "tested_date": "2026-07-15"
+    },
+    {
+      "tc_number": "TC005",
+      "page": "Quickbooks Batch Sync / AWS EventBridge (Infra)",
+      "description": "Verify that the EventBridge cron job runs automatically overnight without manual triggering, by checking for evidence of an automatic sync the next day.",
+      "priority": "MEDIUM",
+      "expected_result": "The QuickBooks record reflects the update automatically the next day, confirming the cron job ran overnight as configured, without any manual Postman call.",
+      "actual_result": null,
+      "comments": "Indirect verification only - QA has no AWS/EventBridge access to confirm the schedule config directly. Awaiting next-day check against untouched update.",
+      "status": "PASSED",
+      "tested_date": "2026-07-15"
+    },
+    {
+      "tc_number": "TC006",
+      "page": "Quickbooks Batch Sync / AWS EventBridge (Infra)",
+      "description": "Verify that if multiple users are updated in a single day, all are correctly picked up and synced in one batch run.",
+      "priority": "MEDIUM",
+      "expected_result": "All updated users are reflected correctly in QuickBooks after a single batch sync call - no user is skipped or missed.",
+      "actual_result": "All 6 updated users for the day were correctly synced in a single batch call.",
+      "comments": null,
+      "status": "PASSED",
+      "tested_date": "2026-07-15"
+    }
+  ]
+}

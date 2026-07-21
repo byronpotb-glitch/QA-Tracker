@@ -1,0 +1,47 @@
+{
+  "ticket": {
+    "title": "NO EXPLANATION FOR 'ESTIMATED' VS 'FROM EZQUOTE' RATE LABELS",
+    "company": "GLADEX",
+    "system": "Gladex Ezquote System",
+    "module": "Generate Quote",
+    "issue_type": "IMPROVEMENT",
+    "tester": "Byron",
+    "ticket_status": "FAILED",
+    "failed_counter": 0
+  },
+  "test_cases": [
+    {
+      "tc_number": "TC001",
+      "page": "Package Rates by Hotel Tier (Admin & Agent)",
+      "description": "Verify a tooltip or inline note appears when hovering/clicking the 'ESTIMATED' tag explaining what it means.",
+      "priority": "MEDIUM",
+      "expected_result": "A clear explanation displays (e.g., 'This rate is not yet confirmed and may change').",
+      "actual_result": null,
+      "comments": null,
+      "status": "FAILED",
+      "tested_date": "2026-07-16"
+    },
+    {
+      "tc_number": "TC002",
+      "page": "Package Rates by Hotel Tier (Admin & Agent)",
+      "description": "Verify the 'FROM EZQUOTE' tag and 'ESTIMATED' tag remain visually distinguishable at a glance.",
+      "priority": "LOW",
+      "expected_result": "Tags are easily distinguishable by color/style, consistent with existing design language.",
+      "actual_result": null,
+      "comments": null,
+      "status": "FAILED",
+      "tested_date": "2026-07-16"
+    },
+    {
+      "tc_number": "TC003",
+      "page": "Package Rates by Hotel Tier (Admin & Agent)",
+      "description": "Verify the explanation for 'ESTIMATED' is consistent between Admin and Agent views.",
+      "priority": "MEDIUM",
+      "expected_result": "Same tooltip/explanation text appears in both Admin and Agent views.",
+      "actual_result": null,
+      "comments": null,
+      "status": "FAILED",
+      "tested_date": "2026-07-16"
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "ticket": {
+    "title": "FIX INFORMATION CONFLICTS AND FORMATTING ERRORS BETWEEN BOOKING SYSTEM AND SOA LEDGERS",
+    "company": "POTB",
+    "system": "LakbayHub/POTB",
+    "module": "SOA / Billing",
+    "issue_type": "BUG",
+    "tester": "Byron",
+    "ticket_status": "FAILED",
+    "failed_counter": 3
+  },
+  "test_cases": [
+    {
+      "tc_number": "TC001",
+      "page": "Booking Confirmation SOA",
+      "description": "Verify contact number is consistent between the booking system and Booking Confirmation SOA.",
+      "priority": "HIGH",
+      "expected_result": "Contact number on the Booking Confirmation SOA should match the booking system record (09876543213).",
+      "actual_result": "Contact number displayed as 9876543123, mismatching the correct 09876543213.",
+      "comments": "Mismatch found: 9876543123 vs correct 09876543213 on other SOA versions. Returned to dev.",
+      "status": "FAILED",
+      "tested_date": null
+    },
+    {
+      "tc_number": "TC002",
+      "page": "B2B Download SOA",
+      "description": "Verify Total Amount calculation includes the service fee.",
+      "priority": "HIGH",
+      "expected_result": "Total Amount should include the P162.50 service fee.",
+      "actual_result": "Total Amount excluded the P162.50 service fee, resulting in an understated total.",
+      "comments": "Php 162.50 service fee excluded from total. Returned to dev.",
+      "status": "FAILED",
+      "tested_date": null
+    },
+    {
+      "tc_number": "TC003",
+      "page": "B2C Download SOA",
+      "description": "Verify Total Amount calculation includes the service fee.",
+      "priority": "HIGH",
+      "expected_result": "Total Amount should include the P162.50 service fee.",
+      "actual_result": "Total Amount excluded the service fee, same defect as B2B Download SOA.",
+      "comments": "Same service fee exclusion issue as B2B Download SOA. Returned to dev.",
+      "status": "FAILED",
+      "tested_date": null
+    },
+    {
+      "tc_number": "TC004",
+      "page": "Updated SOA",
+      "description": "Verify installment split totals reconcile with the full booking amount.",
+      "priority": "MEDIUM",
+      "expected_result": "Sum of installment splits should equal the full booking amount exactly.",
+      "actual_result": "Installment split showed a P0.50 shortfall against the full booking amount.",
+      "comments": "Php 0.50 shortfall found in installment split. Returned to dev.",
+      "status": "FAILED",
+      "tested_date": null
+    },
+    {
+      "tc_number": "TC005",
+      "page": "All SOA Versions (Cross-check)",
+      "description": "Verify contact number consistency across all SOA versions (Booking Confirmation, B2B, B2C, Updated).",
+      "priority": "HIGH",
+      "expected_result": "Contact number should be identical across all SOA versions.",
+      "actual_result": "Cross-system check; mismatch isolated to Booking Confirmation SOA only.",
+      "comments": "Cross-system check; mismatch isolated to Booking Confirmation SOA only.",
+      "status": "FAILED",
+      "tested_date": null
+    },
+    {
+      "tc_number": "TC006",
+      "page": "All SOA Versions (Cross-check)",
+      "description": "Verify currency and decimal formatting is consistent across all SOA types.",
+      "priority": "LOW",
+      "expected_result": "Currency values should follow consistent decimal/format conventions across all SOA types.",
+      "actual_result": "Formatting inconsistencies found alongside the Total Amount defects.",
+      "comments": "Formatting check; found alongside the Total Amount defects.",
+      "status": "FAILED",
+      "tested_date": null
+    }
+  ]
+}

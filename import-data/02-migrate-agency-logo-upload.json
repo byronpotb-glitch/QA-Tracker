@@ -1,0 +1,69 @@
+{
+  "ticket": {
+    "title": "MIGRATE AGENCY LOGO UPLOAD FROM BUNNYCDN TO S3 PRESIGNED URL FLOW",
+    "company": "POTB",
+    "system": "LakbayHub/POTB",
+    "module": "Agency Settings",
+    "issue_type": "IMPROVEMENT",
+    "tester": "Byron",
+    "ticket_status": "PASSED",
+    "failed_counter": 0
+  },
+  "test_cases": [
+    {
+      "tc_number": "TC001",
+      "page": "Agency Profile - Logo Upload",
+      "description": "Verify agency logo upload now stores S3 presigned URL instead of BunnyCDN URL.",
+      "priority": "HIGH",
+      "expected_result": "brand_logo field stores an S3 URL (potb-public-assets-dev bucket) after upload.",
+      "actual_result": "Confirmed via API response that brand_logo field stores the correct S3 URL for test account ByronQA.",
+      "comments": "Confirmed via API response; brand_logo field stores S3 URL (potb-public-assets-dev bucket) for test account ByronQA.",
+      "status": "PASSED",
+      "tested_date": null
+    },
+    {
+      "tc_number": "TC002",
+      "page": "Agency Profile - Logo Upload",
+      "description": "Verify presigned URL flow parameters via Network tab (upload target, headers, expiry).",
+      "priority": "MEDIUM",
+      "expected_result": "Upload request targets the correct S3 presigned URL endpoint with valid headers and expiry.",
+      "actual_result": "Network tab confirmed correct presigned URL parameters at browser level.",
+      "comments": "Verified at browser level; no backend/AWS access available.",
+      "status": "PASSED",
+      "tested_date": null
+    },
+    {
+      "tc_number": "TC003",
+      "page": "Agency Profile - Logo Upload",
+      "description": "Verify uploaded logo renders correctly across the platform after migration to S3.",
+      "priority": "MEDIUM",
+      "expected_result": "Logo displays correctly wherever it appears across the platform (dashboard, SOA, etc.).",
+      "actual_result": "Logo rendered correctly across all checked touchpoints.",
+      "comments": null,
+      "status": "PASSED",
+      "tested_date": null
+    },
+    {
+      "tc_number": "TC004",
+      "page": "Agency Profile - Logo Upload",
+      "description": "Verify re-uploading/replacing a logo correctly overwrites the previous S3 URL.",
+      "priority": "MEDIUM",
+      "expected_result": "New upload replaces the previous logo and updates the brand_logo field to the new S3 URL.",
+      "actual_result": "Re-upload correctly overwrote the previous S3 URL.",
+      "comments": "Edge case.",
+      "status": "PASSED",
+      "tested_date": null
+    },
+    {
+      "tc_number": "TC005",
+      "page": "Agency Profile - Logo Upload",
+      "description": "Verify agencies still on legacy BunnyCDN URLs are unaffected by the migration (regression).",
+      "priority": "MEDIUM",
+      "expected_result": "Agencies not yet migrated continue to display their BunnyCDN logo without disruption.",
+      "actual_result": "Legacy BunnyCDN agencies unaffected; logos still displayed correctly.",
+      "comments": "Related but distinct scope from ADD LEGACY CDN LOGO NOTICE BANNER ticket.",
+      "status": "PASSED",
+      "tested_date": null
+    }
+  ]
+}

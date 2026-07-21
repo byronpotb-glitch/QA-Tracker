@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
+import { CheckCircle2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,30 +26,58 @@ import { importTicket } from "@/app/(dashboard)/tickets/actions";
 export default function ImportPage() {
   const [text, setText] = useState("");
   const [preview, setPreview] = useState<ImportPreview | null>(null);
+  const [imported, setImported] = useState<{ id: string; title: string } | null>(null);
   const [pending, startTransition] = useTransition();
 
-  function handlePreview() {
+  function buildPreviewFromText(): ImportPreview {
     const parsed = parseImportText(text);
     if ("formatError" in parsed) {
-      setPreview({
+      return {
         valid: false,
         formatError: parsed.formatError,
         ticket: { data: {}, errors: [] },
         testCases: [],
-      });
-      return;
+      };
     }
-    setPreview(buildImportPreview(parsed.json));
+    return buildImportPreview(parsed.json);
+  }
+
+  function handlePreview() {
+    setPreview(buildPreviewFromText());
+  }
+
+  function runImport(data: NonNullable<ImportPreview["data"]>) {
+    startTransition(async () => {
+      const result = await importTicket(data);
+      if (result?.error) {
+        toast.error(result.error);
+        return;
+      }
+      toast.success("Ticket imported");
+      setImported({ id: result.ticketId!, title: result.title! });
+      setText("");
+      setPreview(null);
+    });
   }
 
   function handleConfirm() {
     if (!preview?.valid || !preview.data) return;
-    startTransition(async () => {
-      const result = await importTicket(preview.data!);
-      if (result?.error) {
-        toast.error(result.error);
-      }
-    });
+    runImport(preview.data);
+  }
+
+  function handleQuickImport() {
+    const built = buildPreviewFromText();
+    if (!built.valid || !built.data) {
+      setPreview(built);
+      toast.error("Fix the errors below before importing.");
+      return;
+    }
+    setPreview(null);
+    runImport(built.data);
+  }
+
+  function handleImportNew() {
+    setImported(null);
   }
 
   return (
@@ -60,6 +90,32 @@ export default function ImportPage() {
         </p>
       </div>
 
+      {imported && (
+        <Card className="border-green-600/30">
+          <CardContent className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <CheckCircle2Icon className="size-4 shrink-0 text-green-600 dark:text-green-400" />
+              <span className="text-sm">
+                Imported <span className="font-medium">{imported.title}</span>
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                nativeButton={false}
+                render={<Link href={`/tickets/${imported.id}`} />}
+              >
+                View ticket
+              </Button>
+              <Button size="sm" onClick={handleImportNew}>
+                Import new ticket
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <Card>
         <CardContent className="flex flex-col gap-3">
           <Textarea
@@ -68,9 +124,12 @@ export default function ImportPage() {
             placeholder='{"ticket": {...}, "test_cases": [...]}'
             className="min-h-48 font-mono text-xs"
           />
-          <div className="flex justify-end">
-            <Button variant="outline" onClick={handlePreview} disabled={!text.trim()}>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={handlePreview} disabled={!text.trim() || pending}>
               Preview
+            </Button>
+            <Button onClick={handleQuickImport} disabled={!text.trim() || pending}>
+              {pending ? "Importing..." : "Confirm Import"}
             </Button>
           </div>
         </CardContent>

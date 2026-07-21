@@ -1,0 +1,91 @@
+{
+  "ticket": {
+    "title": "ADD LEGACY CDN LOGO NOTICE BANNER TO DASHBOARD",
+    "company": "POTB",
+    "system": "LakbayHub/POTB",
+    "module": "Dashboard",
+    "issue_type": "FEATURE",
+    "tester": "Byron",
+    "ticket_status": "PASSED",
+    "failed_counter": 0
+  },
+  "test_cases": [
+    {
+      "tc_number": "TC001",
+      "page": "Agency Dashboard - Notice Banner",
+      "description": "Verify notice banner displays for agencies still on legacy CDN (not reuploaded).",
+      "priority": "MEDIUM",
+      "expected_result": "Notification Displays for Legacy CDN Agencies",
+      "actual_result": "Banner displays with \"Action needed\" message on Home dashboard.",
+      "comments": "Message Displayed",
+      "status": "PASSED",
+      "tested_date": null
+    },
+    {
+      "tc_number": "TC002",
+      "page": "Agency Dashboard - Notice Banner",
+      "description": "Verify clicking notification redirects to My Profile for logo reupload.",
+      "priority": "MEDIUM",
+      "expected_result": "Notification Redirects to My Profile",
+      "actual_result": "Clicking \"My Profile\" link redirects user to profile page.",
+      "comments": "Redirect worked correctly.",
+      "status": "PASSED",
+      "tested_date": null
+    },
+    {
+      "tc_number": "TC003",
+      "page": "Agency Dashboard - Notice Banner",
+      "description": "Verify new accounts (no legacy CDN logo) do not see the notification.",
+      "priority": "LOW",
+      "expected_result": "No Notification for New Accounts",
+      "actual_result": "No banner shown for new accounts.",
+      "comments": "Confirmed no banner appeared for new account.",
+      "status": "PASSED",
+      "tested_date": null
+    },
+    {
+      "tc_number": "TC004",
+      "page": "Agency Dashboard - Notice Banner",
+      "description": "Verify notification disappears after logo is reuploaded/migrated.",
+      "priority": "LOW",
+      "expected_result": "Notification Disappears After Logo Reupload",
+      "actual_result": "Banner correctly disappeared after logo change.",
+      "comments": "Banner correctly disappeared after logo change.",
+      "status": "PASSED",
+      "tested_date": null
+    },
+    {
+      "tc_number": "TC005",
+      "page": "Agency Dashboard - Notice Banner",
+      "description": "Verify dismissing (\"X\") does not permanently remove the notification until logo is reuploaded.",
+      "priority": "LOW",
+      "expected_result": "Dismissing (\"X\") Does Not Permanently Remove Notification",
+      "actual_result": "Banner reappears after refresh/logout-login if logo still unmigrated.",
+      "comments": "Banner correctly reappeared after refresh and logout/login.",
+      "status": "PASSED",
+      "tested_date": null
+    },
+    {
+      "tc_number": "TC006",
+      "page": "Agency Dashboard - Notice Banner",
+      "description": "Verify notification consistency across Home dashboard and My Profile page.",
+      "priority": "LOW",
+      "expected_result": "Notification Consistency Across Pages",
+      "actual_result": "Same banner/message shows on both pages while logo remains unmigrated.",
+      "comments": "Confirmed via screenshots — identical banner on both pages.",
+      "status": "PASSED",
+      "tested_date": null
+    },
+    {
+      "tc_number": "TC007",
+      "page": "Agency Dashboard - Notice Banner",
+      "description": "Verify banner does not block other dashboard functionality.",
+      "priority": "LOW",
+      "expected_result": "Banner Does Not Block Other Dashboard Functionality",
+      "actual_result": "All other dashboard features remain functional with banner displayed.",
+      "comments": "No interference observed; dashboard functioned normally.",
+      "status": "PASSED",
+      "tested_date": null
+    }
+  ]
+}

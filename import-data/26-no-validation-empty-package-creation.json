@@ -1,0 +1,69 @@
+{
+  "ticket": {
+    "title": "NO VALIDATION PREVENTING EMPTY/₱0 PACKAGE CREATION",
+    "company": "GLADEX",
+    "system": "Gladex Ezquote System",
+    "module": "Generate Quote",
+    "issue_type": "BUG",
+    "tester": "Byron",
+    "ticket_status": "FAILED",
+    "failed_counter": 0
+  },
+  "test_cases": [
+    {
+      "tc_number": "TC001",
+      "page": "Add Package (Admin)",
+      "description": "Verify clicking 'Add package' with a blank package name is blocked with a validation message.",
+      "priority": "HIGH",
+      "expected_result": "Save is blocked; an inline error prompts for a package name.",
+      "actual_result": null,
+      "comments": null,
+      "status": "FAILED",
+      "tested_date": "2026-07-16"
+    },
+    {
+      "tc_number": "TC002",
+      "page": "Add Package (Admin)",
+      "description": "Verify clicking 'Add package' with all rate fields left at 0 is blocked with a validation message.",
+      "priority": "HIGH",
+      "expected_result": "Save is blocked; an inline error prompts for at least one valid rate.",
+      "actual_result": null,
+      "comments": null,
+      "status": "FAILED",
+      "tested_date": "2026-07-16"
+    },
+    {
+      "tc_number": "TC003",
+      "page": "Add Package (Admin)",
+      "description": "Verify 'Save as draft' still allows incomplete data (blank name/₱0 rate) without blocking.",
+      "priority": "MEDIUM",
+      "expected_result": "Draft saves successfully without validation errors.",
+      "actual_result": null,
+      "comments": null,
+      "status": "FAILED",
+      "tested_date": "2026-07-16"
+    },
+    {
+      "tc_number": "TC004",
+      "page": "Add Package (Admin)",
+      "description": "Verify draft packages are visually marked as 'Draft' and are hidden from the Agent-facing package list until completed.",
+      "priority": "HIGH",
+      "expected_result": "Draft badge is visible in Admin view; package does not appear anywhere in Agent view.",
+      "actual_result": null,
+      "comments": null,
+      "status": "FAILED",
+      "tested_date": "2026-07-16"
+    },
+    {
+      "tc_number": "TC005",
+      "page": "Add Package (Admin)",
+      "description": "Verify a previously created empty/₱0 package (existing data prior to the fix) is flagged for admin review rather than silently exposed to agents.",
+      "priority": "MEDIUM",
+      "expected_result": "Existing incomplete packages are flagged or migrated to Draft status, not left visible to agents as-is.",
+      "actual_result": null,
+      "comments": null,
+      "status": "FAILED",
+      "tested_date": "2026-07-16"
+    }
+  ]
+}

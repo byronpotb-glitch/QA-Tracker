@@ -1,0 +1,69 @@
+{
+  "ticket": {
+    "title": "QUOTED RATE DOES NOT MATCH RATE BREAKDOWN CALCULATION",
+    "company": "GLADEX",
+    "system": "Gladex Ezquote System",
+    "module": "Generate Quote",
+    "issue_type": "BUG",
+    "tester": "Byron",
+    "ticket_status": "IN_PROGRESS",
+    "failed_counter": 0
+  },
+  "test_cases": [
+    {
+      "tc_number": "TC001",
+      "page": "Generate Quotation (Admin & Agent)",
+      "description": "Verify the Rate Breakdown total matches the Generated Quotation rate for Bacolod Package 5, Budget tier, 4 pax.",
+      "priority": "HIGH",
+      "expected_result": "Both values show the identical final rate (currently ₱2,399 vs ₱2,499 mismatch).",
+      "actual_result": null,
+      "comments": null,
+      "status": "FAILED",
+      "tested_date": "2026-07-16"
+    },
+    {
+      "tc_number": "TC002",
+      "page": "Generate Quotation (Admin & Agent)",
+      "description": "Verify rate consistency across different pax counts (Solo through 13 pax) for the same package and tier.",
+      "priority": "HIGH",
+      "expected_result": "Rate Breakdown and Generated Quotation match at every pax count.",
+      "actual_result": null,
+      "comments": null,
+      "status": "FAILED",
+      "tested_date": "2026-07-16"
+    },
+    {
+      "tc_number": "TC003",
+      "page": "Generate Quotation (Admin & Agent)",
+      "description": "Verify rate consistency across different hotel tiers (Budget, 3-Star A, 3-Star B, 4-Star) for the same package.",
+      "priority": "HIGH",
+      "expected_result": "Rate Breakdown and Generated Quotation match for every hotel tier.",
+      "actual_result": null,
+      "comments": null,
+      "status": "FAILED",
+      "tested_date": "2026-07-16"
+    },
+    {
+      "tc_number": "TC004",
+      "page": "Generate Quotation (Admin & Agent)",
+      "description": "Verify rate consistency when 'Add airfare' and 'Your markup' fields are populated in Booking Details.",
+      "priority": "MEDIUM",
+      "expected_result": "Airfare and markup are correctly folded into both the Rate Breakdown and the quoted total, with matching final numbers.",
+      "actual_result": null,
+      "comments": null,
+      "status": "FAILED",
+      "tested_date": "2026-07-16"
+    },
+    {
+      "tc_number": "TC005",
+      "page": "Generate Quotation (Admin & Agent)",
+      "description": "Verify rate consistency between the Admin view and the Agent view for the same package/tier/pax selection.",
+      "priority": "HIGH",
+      "expected_result": "Admin and Agent both display the same final rate for identical selections.",
+      "actual_result": null,
+      "comments": null,
+      "status": "FAILED",
+      "tested_date": "2026-07-16"
+    }
+  ]
+}

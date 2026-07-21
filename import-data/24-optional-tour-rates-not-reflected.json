@@ -1,0 +1,69 @@
+{
+  "ticket": {
+    "title": "OPTIONAL TOUR RATES NOT REFLECTED IN STRUCTURED FIELDS",
+    "company": "GLADEX",
+    "system": "Gladex Ezquote System",
+    "module": "Generate Quote",
+    "issue_type": "BUG",
+    "tester": "Byron",
+    "ticket_status": "IN_PROGRESS",
+    "failed_counter": 0
+  },
+  "test_cases": [
+    {
+      "tc_number": "TC001",
+      "page": "Manage Optional Tours (Admin)",
+      "description": "Verify structured Cost/Markup/Adult fields populate correctly after clicking 'Auto-split into separate tours' on the reference text.",
+      "priority": "HIGH",
+      "expected_result": "Structured fields for all 8 tours populate with the correct values parsed from the reference text (no longer showing '—').",
+      "actual_result": null,
+      "comments": null,
+      "status": "FAILED",
+      "tested_date": "2026-07-16"
+    },
+    {
+      "tc_number": "TC002",
+      "page": "Manage Optional Tours (Admin)",
+      "description": "Verify per-pax rates in the structured fields match the values listed in the free-text reference block for the same tour.",
+      "priority": "HIGH",
+      "expected_result": "Structured per-pax values (2-13 pax, Solo, Child) exactly match the reference text values.",
+      "actual_result": null,
+      "comments": null,
+      "status": "FAILED",
+      "tested_date": "2026-07-16"
+    },
+    {
+      "tc_number": "TC003",
+      "page": "Manage Optional Tours (Admin)",
+      "description": "Verify editing the reference text and re-running Auto-split updates the structured fields accordingly.",
+      "priority": "MEDIUM",
+      "expected_result": "Structured fields reflect the latest edited reference text after re-running Auto-split.",
+      "actual_result": null,
+      "comments": null,
+      "status": "FAILED",
+      "tested_date": "2026-07-16"
+    },
+    {
+      "tc_number": "TC004",
+      "page": "Manage Optional Tours (Admin)",
+      "description": "Verify manually editing a structured tour field does not get silently overwritten by stale reference text on next load.",
+      "priority": "MEDIUM",
+      "expected_result": "Manual edits persist and are not overwritten unless Auto-split is explicitly re-run.",
+      "actual_result": null,
+      "comments": null,
+      "status": "FAILED",
+      "tested_date": "2026-07-16"
+    },
+    {
+      "tc_number": "TC005",
+      "page": "Manage Optional Tours (Admin)",
+      "description": "Verify Child rate and per-pax data entered in Manage Optional Tours correctly reflects on the Agent-facing quotation output.",
+      "priority": "HIGH",
+      "expected_result": "Agent-facing optional tour pricing matches what was configured in the structured fields.",
+      "actual_result": null,
+      "comments": null,
+      "status": "FAILED",
+      "tested_date": "2026-07-16"
+    }
+  ]
+}

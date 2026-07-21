@@ -1,0 +1,113 @@
+{
+  "ticket": {
+    "title": "FIX ENCOUNTERED ERROR WHEN CURRENCY CHANGED AND THE NATIONALITY WAS NOT ABLE TO CHANGE",
+    "company": "POTB",
+    "system": "LakbayHub/POTB",
+    "module": "Airline",
+    "issue_type": "BUG_FIX",
+    "tester": "Byron",
+    "ticket_status": "PASSED",
+    "failed_counter": 0
+  },
+  "test_cases": [
+    {
+      "tc_number": "TC001",
+      "page": "Passenger Details Form",
+      "description": "Verify Nationality dropdown works correctly before any currency change (baseline).",
+      "priority": "HIGH",
+      "expected_result": "Dropdown populates with a full country list and allows selection normally.",
+      "actual_result": "Nationality dropdown populated with the full country list and allowed normal selection under the default currency.",
+      "comments": "Baseline confirmed working prior to reproducing the reported issue.",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC002",
+      "page": "Passenger Details Form",
+      "description": "Verify Nationality dropdown after changing currency (core bug reproduction).",
+      "priority": "HIGH",
+      "expected_result": "Dropdown still populates with the full country list and allows a value to be selected/changed without error.",
+      "actual_result": "After changing currency, the Nationality dropdown populated correctly and a country could be selected without error.",
+      "comments": "Fix confirmed - dropdown no longer breaks on currency change.",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC003",
+      "page": "Passenger Details Form",
+      "description": "Verify no console/network errors are thrown on currency change.",
+      "priority": "HIGH",
+      "expected_result": "No errors in console; any country-list API call tied to currency change returns successfully (200).",
+      "actual_result": "No JS console errors observed; country-list API call returned 200 successfully after currency change.",
+      "comments": "Verified via DevTools Console and Network tabs.",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC004",
+      "page": "Passenger Details Form",
+      "description": "Verify behavior when Nationality was already selected, then currency is changed.",
+      "priority": "HIGH",
+      "expected_result": "Previously selected nationality either remains intact, or if reset, the dropdown is still fully functional and re-selectable - never left in a broken/unselectable state.",
+      "actual_result": "Previously selected nationality value remained intact after the currency change; dropdown stayed fully functional.",
+      "comments": "No reset or corruption of existing selection observed.",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC005",
+      "page": "Passenger Details Form",
+      "description": "Verify multiple currency changes in succession don't compound the issue.",
+      "priority": "MEDIUM",
+      "expected_result": "Dropdown remains functional after multiple rapid/successive currency changes.",
+      "actual_result": "Dropdown remained functional and selectable even after switching currency twice in succession (PHP to USD to SGD).",
+      "comments": "No degradation observed with repeated triggers.",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC006",
+      "page": "Passenger Details Form",
+      "description": "Verify Passport Issue Country dropdown (adjacent field) is not similarly affected.",
+      "priority": "MEDIUM",
+      "expected_result": "Passport Issue Country dropdown also populates and functions correctly - confirms whether the bug is isolated to Nationality or affects all country-list dropdowns on the form.",
+      "actual_result": "Passport Issue Country dropdown populated and functioned correctly after currency change, consistent with the Nationality field.",
+      "comments": "Confirms the underlying fix covers shared country-list component, not just Nationality.",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC007",
+      "page": "Passenger Details Form",
+      "description": "Verify fix works across all supported currencies.",
+      "priority": "MEDIUM",
+      "expected_result": "Nationality dropdown works correctly regardless of which currency is selected.",
+      "actual_result": "Nationality dropdown worked correctly across all supported currency options tested.",
+      "comments": "No currency-specific exceptions found.",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC008",
+      "page": "Passenger Details Form",
+      "description": "Verify fix works across multiple passenger entries (Passenger #2, #3, etc.).",
+      "priority": "MEDIUM",
+      "expected_result": "Nationality dropdown works correctly for all passenger entries, not only the first.",
+      "actual_result": "Nationality dropdown worked correctly for Passenger #2 and subsequent passenger entries after currency change.",
+      "comments": "Fix applies consistently across all passenger blocks.",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    },
+    {
+      "tc_number": "TC009",
+      "page": "Passenger Details Form",
+      "description": "Verify currency change does not block form submission after Nationality is set.",
+      "priority": "HIGH",
+      "expected_result": "Form submits successfully with the selected Nationality value correctly saved/passed to the next step (no validation error, no reversion to blank).",
+      "actual_result": "Form submitted successfully with the selected Nationality value correctly carried through to the next step; no validation error or blank reversion.",
+      "comments": "End-to-end flow confirmed working.",
+      "status": "PASSED",
+      "tested_date": "2026-07-14"
+    }
+  ]
+}
