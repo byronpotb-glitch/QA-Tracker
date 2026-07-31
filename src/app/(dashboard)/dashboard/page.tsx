@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { desc, gt, sql } from "drizzle-orm";
+import { and, desc, eq, gt, gte, lte, sql } from "drizzle-orm";
 import {
   TicketIcon,
   ClipboardListIcon,
@@ -28,7 +28,11 @@ import {
   sortByLowPerformance,
 } from "@/lib/dev-performance";
 import { DevMiniList } from "../dev-mini-list";
-import type { TicketStatus, TestCaseStatus } from "@/lib/validations";
+import { DashboardDateFilter, type DateField } from "./date-filter";
+import { DashboardCompanyFilter } from "./company-filter";
+import type { Company, TicketStatus, TestCaseStatus } from "@/lib/validations";
+
+const COMPANIES: readonly Company[] = ["POTB", "GLADEX"];
 
 export const dynamic = "force-dynamic";
 
@@ -49,20 +53,58 @@ const TEST_CASE_STATUSES: readonly TestCaseStatus[] = [
   "NOT_TESTED",
 ];
 
-export default async function DashboardPage() {
-  const [ticketRows, testCaseRows, recurringFailures, devRows] = await Promise.all([
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ from?: string; to?: string; field?: string; company?: string }>;
+}) {
+  const params = await searchParams;
+  const dateField: DateField = params.field === "updated" ? "updated" : "created";
+  const dateColumn = dateField === "updated" ? tickets.updatedAt : tickets.createdAt;
+
+  const company: Company | undefined =
+    params.company === "POTB" || params.company === "GLADEX" ? params.company : undefined;
+  const companyQueryParam = company ? `company=${company}` : "";
+
+  const dateRange =
+    params.from && params.to
+      ? {
+          from: new Date(`${params.from}T00:00:00`),
+          to: new Date(`${params.to}T23:59:59.999`),
+        }
+      : null;
+
+  const baseConditions = [
+    dateRange ? gte(dateColumn, dateRange.from) : undefined,
+    dateRange ? lte(dateColumn, dateRange.to) : undefined,
+    company ? eq(tickets.company, company) : undefined,
+  ].filter((c) => c !== undefined);
+
+  const ticketDateFilter = baseConditions.length ? and(...baseConditions) : undefined;
+  const recurringFilter = and(gt(tickets.failedCounter, 0), ...baseConditions);
+
+  const [ticketRows, testCaseRows, recurringFailures, devRows, companyRows] = await Promise.all([
     db
       .select({ status: tickets.ticketStatus, count: sql<number>`count(*)::int` })
       .from(tickets)
+      .where(ticketDateFilter)
       .groupBy(tickets.ticketStatus),
     db
       .select({ status: testCases.status, count: sql<number>`count(*)::int` })
       .from(testCases)
+      .innerJoin(tickets, eq(testCases.ticketId, tickets.id))
+      .where(ticketDateFilter)
       .groupBy(testCases.status),
     db
-      .select()
+      .select({
+        id: tickets.id,
+        title: tickets.title,
+        company: tickets.company,
+        ticketStatus: tickets.ticketStatus,
+        failedCounter: tickets.failedCounter,
+      })
       .from(tickets)
-      .where(gt(tickets.failedCounter, 0))
+      .where(recurringFilter)
       .orderBy(desc(tickets.failedCounter)),
     db
       .select({
@@ -70,8 +112,16 @@ export default async function DashboardPage() {
         ticketStatus: tickets.ticketStatus,
         failedCounter: tickets.failedCounter,
       })
-      .from(tickets),
+      .from(tickets)
+      .where(ticketDateFilter),
+    db
+      .select({ company: tickets.company, count: sql<number>`count(*)::int` })
+      .from(tickets)
+      .where(ticketDateFilter)
+      .groupBy(tickets.company),
   ]);
+
+  const companyCountMap = new Map(companyRows.map((r) => [r.company, r.count]));
 
   const devPerformance = computeDevPerformance(devRows);
   const topPerformers = sortByHighPerformance(
@@ -98,20 +148,26 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-lg font-semibold">Dashboard</h1>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <h1 className="text-lg font-semibold">Dashboard</h1>
+        <div className="flex flex-wrap items-center gap-2">
+          <DashboardCompanyFilter company={company} />
+          <DashboardDateFilter from={params.from} to={params.to} field={dateField} />
+        </div>
+      </div>
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         <StatTile
           label="Total tickets"
           value={totalTickets}
           icon={TicketIcon}
-          href="/tickets"
+          href={company ? `/tickets?${companyQueryParam}` : "/tickets"}
         />
         <StatTile
           label="Total test cases"
           value={totalTestCases}
           icon={ClipboardListIcon}
-          href="/tickets"
+          href={company ? `/tickets/test-cases?${companyQueryParam}` : "/tickets/test-cases"}
         />
         <StatTile
           label="Failed tickets"
@@ -119,7 +175,7 @@ export default async function DashboardPage() {
           icon={XCircleIcon}
           tone="critical"
           percent={pct(failedCount)}
-          href="/tickets?status=FAILED"
+          href={`/tickets?status=FAILED${company ? `&${companyQueryParam}` : ""}`}
         />
         <StatTile
           label="Recurring failures"
@@ -127,17 +183,20 @@ export default async function DashboardPage() {
           icon={RefreshCcwIcon}
           tone="warning"
           percent={pct(recurringFailures.length)}
-          href="/tickets?recurring=1"
+          href={`/tickets?recurring=1${company ? `&${companyQueryParam}` : ""}`}
         />
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-3">
         <Card>
           <CardHeader>
             <CardTitle className="text-sm font-medium">Tickets by status</CardTitle>
           </CardHeader>
           <CardContent>
-            <StatusBarChart data={ticketChartData} />
+            <StatusBarChart
+              data={ticketChartData}
+              linkBase={`/tickets?${company ? `${companyQueryParam}&` : ""}status=`}
+            />
           </CardContent>
         </Card>
         <Card>
@@ -145,9 +204,13 @@ export default async function DashboardPage() {
             <CardTitle className="text-sm font-medium">Test cases by status</CardTitle>
           </CardHeader>
           <CardContent>
-            <StatusBarChart data={testCaseChartData} />
+            <StatusBarChart
+              data={testCaseChartData}
+              linkBase={`/tickets/test-cases?${company ? `${companyQueryParam}&` : ""}tc_status=`}
+            />
           </CardContent>
         </Card>
+        <CompanyBreakdownCard companyCountMap={companyCountMap} total={totalTickets} />
       </div>
 
       <div className="flex flex-col gap-3">
@@ -236,7 +299,7 @@ export default async function DashboardPage() {
                   <TableCell>
                     <StatusBadge status={ticket.ticketStatus} />
                   </TableCell>
-                  <TableCell className="text-right font-semibold text-destructive">
+                  <TableCell className="text-right font-mono font-semibold tabular-nums text-destructive">
                     {ticket.failedCounter}
                   </TableCell>
                 </TableRow>
@@ -246,6 +309,65 @@ export default async function DashboardPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+function CompanyBreakdownCard({
+  companyCountMap,
+  total,
+}: {
+  companyCountMap: Map<Company, number>;
+  total: number;
+}) {
+  const pct = (n: number) => (total > 0 ? Math.round((n / total) * 100) : 0);
+  const companyClass: Record<Company, string> = {
+    POTB: "bg-blue-600",
+    GLADEX: "bg-purple-600",
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-sm font-medium">Tickets by company</CardTitle>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-4">
+        <div className="flex h-2.5 w-full overflow-hidden rounded-full bg-muted">
+          {COMPANIES.map((company) => {
+            const count = companyCountMap.get(company) ?? 0;
+            const width = pct(count);
+            if (width === 0) return null;
+            return (
+              <div
+                key={company}
+                className={companyClass[company]}
+                style={{ width: `${width}%` }}
+              />
+            );
+          })}
+        </div>
+        <div className="flex flex-col gap-1">
+          {COMPANIES.map((company) => {
+            const count = companyCountMap.get(company) ?? 0;
+            return (
+              <Link
+                key={company}
+                href={`/tickets?company=${company}`}
+                className="-mx-2 flex items-center justify-between rounded-lg px-2 py-1.5 text-sm transition-colors hover:bg-muted"
+              >
+                <span className="flex items-center gap-2 font-medium">
+                  <span className={`size-2 shrink-0 rounded-full ${companyClass[company]}`} />
+                  {company}
+                </span>
+                <span className="font-mono tabular-nums text-muted-foreground">
+                  {count}
+                  <span className="ml-1.5 text-xs">{pct(count)}%</span>
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -266,8 +388,8 @@ function StatTile({
 }) {
   const toneClasses = {
     default: {
-      iconBg: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
-      bar: "bg-blue-600",
+      iconBg: "bg-muted text-foreground/70",
+      bar: "bg-foreground/70",
     },
     critical: {
       iconBg: "bg-destructive/10 text-destructive",
@@ -291,7 +413,9 @@ function StatTile({
               <Icon className="size-4" />
             </div>
           </div>
-          <span className="text-2xl font-semibold">{value.toLocaleString()}</span>
+          <span className="font-mono text-2xl font-semibold tabular-nums">
+            {value.toLocaleString()}
+          </span>
           {percent !== undefined && (
             <div className="flex items-center gap-2">
               <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
@@ -300,7 +424,9 @@ function StatTile({
                   style={{ width: `${Math.min(100, percent)}%` }}
                 />
               </div>
-              <span className="text-xs text-muted-foreground">{percent}%</span>
+              <span className="font-mono text-xs tabular-nums text-muted-foreground">
+                {percent}%
+              </span>
             </div>
           )}
         </CardContent>

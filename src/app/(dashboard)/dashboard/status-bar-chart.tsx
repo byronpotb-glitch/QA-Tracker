@@ -1,14 +1,20 @@
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Bar, BarChart, Cell, LabelList, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
+// Sourced from the design system's status palette (good/warning/critical) plus
+// categorical slot 1 (blue) for the non-status "active" state and the muted/
+// baseline ink tokens for the two "nothing has happened yet" states — never
+// an eyeballed hex. See the dataviz skill's palette.md.
 const STATUS_COLORS: Record<string, string> = {
-  PASSED: "#16a34a",
-  FAILED: "#dc2626",
-  IN_PROGRESS: "#2563eb",
-  PENDING: "#71717a",
-  ON_HOLD: "#d97706",
-  NOT_TESTED: "#a1a1aa",
+  PASSED: "#0ca30c",
+  FAILED: "#d03b3b",
+  ON_HOLD: "#fab219",
+  IN_PROGRESS: "#2a78d6",
+  PENDING: "#898781",
+  NOT_TESTED: "#c3c2b7",
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -22,9 +28,16 @@ const STATUS_LABELS: Record<string, string> = {
 
 export function StatusBarChart({
   data,
+  linkBase,
 }: {
   data: { status: string; count: number }[];
+  /** When provided (e.g. "/tickets?status="), bars become clickable links to `${linkBase}${status}`. */
+  linkBase?: string;
 }) {
+  const router = useRouter();
+  const [hoverIndex, setHoverIndex] = useState<number | null>(null);
+  const getHref = (status: string) => (linkBase ? `${linkBase}${status}` : undefined);
+
   const chartData = data.map((d) => ({
     ...d,
     label: STATUS_LABELS[d.status] ?? d.status,
@@ -57,14 +70,39 @@ export function StatusBarChart({
           }}
           labelStyle={{ color: "var(--popover-foreground)" }}
         />
-        <Bar dataKey="count" radius={[0, 4, 4, 0]} maxBarSize={20}>
-          {chartData.map((entry) => (
-            <Cell key={entry.status} fill={STATUS_COLORS[entry.status] ?? "#a1a1aa"} />
-          ))}
+        <Bar
+          dataKey="count"
+          radius={[0, 4, 4, 0]}
+          maxBarSize={20}
+          background={{ fill: "var(--muted)", radius: 4 }}
+          onMouseEnter={(_, index) => setHoverIndex(index)}
+          onMouseLeave={() => setHoverIndex(null)}
+          onClick={(entry) => {
+            const status = entry.payload?.status as string | undefined;
+            const href = status ? getHref?.(status) : undefined;
+            if (href) router.push(href);
+          }}
+        >
+          {chartData.map((entry, index) => {
+            const href = getHref?.(entry.status);
+            return (
+              <Cell
+                key={entry.status}
+                fill={STATUS_COLORS[entry.status] ?? "#a1a1aa"}
+                fillOpacity={hoverIndex === index ? 0.8 : 1}
+                cursor={href ? "pointer" : undefined}
+              />
+            );
+          })}
           <LabelList
             dataKey="count"
             position="right"
-            style={{ fill: "var(--foreground)", fontSize: 12, fontWeight: 600 }}
+            style={{
+              fill: "var(--foreground)",
+              fontSize: 12,
+              fontWeight: 600,
+              fontFamily: "var(--font-mono)",
+            }}
           />
         </Bar>
       </BarChart>

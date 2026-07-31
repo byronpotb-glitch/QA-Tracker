@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/table";
 import { StatusBadge } from "@/lib/status";
 import { TicketFilters } from "./ticket-filters";
+import { CreatedDateCell } from "./created-date-cell";
 import type { Company, IssueType, TicketStatus } from "@/lib/validations";
 
 const COMPANIES: readonly Company[] = ["POTB", "GLADEX"];
@@ -96,9 +97,18 @@ export default async function TicketsPage({
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-4">
         <h1 className="text-lg font-semibold">Tickets</h1>
-        <Button nativeButton={false} render={<Link href="/tickets/new" />}>
-          New Ticket
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            nativeButton={false}
+            render={<Link href="/tickets/test-cases" />}
+          >
+            Test Cases
+          </Button>
+          <Button nativeButton={false} render={<Link href="/tickets/new" />}>
+            New Ticket
+          </Button>
+        </div>
       </div>
 
       <TicketFilters
@@ -133,6 +143,7 @@ export default async function TicketsPage({
               <TableHead>Tester</TableHead>
               <TableHead>Dev</TableHead>
               <TableHead>Recurring</TableHead>
+              <TableHead>Created</TableHead>
               <TableHead>Updated</TableHead>
             </TableRow>
           </TableHeader>
@@ -140,7 +151,7 @@ export default async function TicketsPage({
             {rows.length === 0 && (
               <TableRow>
                 <TableCell
-                  colSpan={9}
+                  colSpan={10}
                   className="py-8 text-center text-muted-foreground"
                 >
                   No tickets yet. Create one or import from the AI workflow.
@@ -170,6 +181,9 @@ export default async function TicketsPage({
                   {ticket.dev ?? "—"}
                 </TableCell>
                 <TableCell>{ticket.failedCounter}</TableCell>
+                <TableCell className="text-muted-foreground">
+                  <CreatedDateCell ticketId={ticket.id} createdAt={ticket.createdAt} />
+                </TableCell>
                 <TableCell className="text-muted-foreground">
                   {dateFormatter.format(ticket.updatedAt)}
                 </TableCell>

@@ -18,6 +18,8 @@ import { TicketControls } from "./ticket-controls";
 import { TestCaseDialog } from "./test-case-dialog";
 import { TestCaseRow } from "./test-case-row";
 import { DevField } from "./dev-field";
+import { CreatedDateField } from "./created-date-field";
+import { TestCaseHistoryDialog } from "./test-case-history-dialog";
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   dateStyle: "medium",
@@ -40,12 +42,13 @@ export default async function TicketDetailPage({
     notFound();
   }
 
-  const testCases = [...ticket.testCases]
-    .sort((a, b) => a.tcNumber.localeCompare(b.tcNumber, undefined, { numeric: true }))
-    .map((tc) => ({
-      ...tc,
-      history: [...tc.history].sort((a, b) => a.round - b.round),
-    }));
+  const testCases = [...ticket.testCases].sort((a, b) =>
+    a.tcNumber.localeCompare(b.tcNumber, undefined, { numeric: true })
+  );
+
+  const historyEntries = testCases.flatMap((tc) =>
+    tc.history.map((h) => ({ ...h, tcNumber: tc.tcNumber, page: tc.page }))
+  );
 
   return (
     <div className="flex flex-col gap-6">
@@ -101,7 +104,9 @@ export default async function TicketDetailPage({
             </div>
             <div>
               <dt className="text-muted-foreground">Created</dt>
-              <dd>{dateFormatter.format(ticket.createdAt)}</dd>
+              <dd>
+                <CreatedDateField ticketId={ticket.id} createdAt={ticket.createdAt} />
+              </dd>
             </div>
             <div>
               <dt className="text-muted-foreground">Updated</dt>
@@ -116,15 +121,18 @@ export default async function TicketDetailPage({
           <h2 className="text-base font-semibold">
             Test Cases ({testCases.length})
           </h2>
-          <TestCaseDialog
-            ticketId={ticket.id}
-            trigger={
-              <Button size="sm">
-                <PlusIcon />
-                Add test case
-              </Button>
-            }
-          />
+          <div className="flex items-center gap-2">
+            <TestCaseHistoryDialog entries={historyEntries} />
+            <TestCaseDialog
+              ticketId={ticket.id}
+              trigger={
+                <Button size="sm">
+                  <PlusIcon />
+                  Add test case
+                </Button>
+              }
+            />
+          </div>
         </div>
 
         <div className="rounded-xl ring-1 ring-foreground/10">
@@ -152,12 +160,7 @@ export default async function TicketDetailPage({
                 </TableRow>
               )}
               {testCases.map((tc) => (
-                <TestCaseRow
-                  key={tc.id}
-                  ticketId={ticket.id}
-                  testCase={tc}
-                  history={tc.history}
-                />
+                <TestCaseRow key={tc.id} ticketId={ticket.id} testCase={tc} />
               ))}
             </TableBody>
           </Table>

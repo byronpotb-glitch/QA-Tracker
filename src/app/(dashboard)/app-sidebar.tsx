@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -8,24 +9,40 @@ import {
   UploadIcon,
   UsersIcon,
   LogOutIcon,
+  ChevronDownIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut } from "./actions";
 
-const NAV_ITEMS = [
+interface NavItem {
+  href: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  children?: { href: string; label: string }[];
+}
+
+const NAV_ITEMS: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboardIcon },
-  { href: "/tickets", label: "Tickets", icon: TicketIcon },
+  {
+    href: "/tickets",
+    label: "Tickets",
+    icon: TicketIcon,
+    children: [{ href: "/tickets/test-cases", label: "Test Cases" }],
+  },
   { href: "/import", label: "Import", icon: UploadIcon },
   { href: "/dev-performance", label: "Dev Performance", icon: UsersIcon },
 ];
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(NAV_ITEMS.filter((item) => item.children).map((item) => [item.href, true]))
+  );
 
   return (
     <aside className="flex w-60 shrink-0 flex-col gap-6 bg-zinc-950 p-4">
       <div className="flex items-center gap-2 px-2 py-1">
-        <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100 text-xs font-bold text-zinc-950">
+        <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-indigo-500 text-xs font-bold text-white">
           QA
         </div>
         <span className="text-sm font-semibold text-zinc-100">
@@ -35,22 +52,67 @@ export function AppSidebar() {
 
       <nav className="flex flex-1 flex-col gap-1">
         {NAV_ITEMS.map((item) => {
-          const active = pathname.startsWith(item.href);
+          const childActive =
+            item.children?.some((child) => pathname.startsWith(child.href)) ?? false;
+          const active = !childActive && pathname.startsWith(item.href);
           const Icon = item.icon;
+
+          const isOpen = openGroups[item.href] ?? true;
+
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                active
-                  ? "bg-zinc-100 text-zinc-950"
-                  : "text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100"
+            <div key={item.href} className="flex flex-col gap-1">
+              <div className="flex items-center gap-1">
+                <Link
+                  href={item.href}
+                  className={cn(
+                    "flex flex-1 items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                    active
+                      ? "bg-indigo-500 text-white shadow-sm shadow-indigo-950/40"
+                      : "text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100"
+                  )}
+                >
+                  <Icon className="size-4" />
+                  {item.label}
+                </Link>
+                {item.children && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setOpenGroups((prev) => ({ ...prev, [item.href]: !isOpen }))
+                    }
+                    aria-label={isOpen ? `Collapse ${item.label}` : `Expand ${item.label}`}
+                    aria-expanded={isOpen}
+                    className="flex size-8 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-900 hover:text-zinc-100"
+                  >
+                    <ChevronDownIcon
+                      className={cn("size-4 transition-transform", !isOpen && "-rotate-90")}
+                    />
+                  </button>
+                )}
+              </div>
+
+              {item.children && isOpen && (
+                <div className="flex flex-col gap-1 pl-6">
+                  {item.children.map((child) => {
+                    const childIsActive = pathname.startsWith(child.href);
+                    return (
+                      <Link
+                        key={child.href}
+                        href={child.href}
+                        className={cn(
+                          "rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
+                          childIsActive
+                            ? "bg-indigo-500/15 text-indigo-300"
+                            : "text-zinc-500 hover:bg-zinc-900 hover:text-zinc-100"
+                        )}
+                      >
+                        {child.label}
+                      </Link>
+                    );
+                  })}
+                </div>
               )}
-            >
-              <Icon className="size-4" />
-              {item.label}
-            </Link>
+            </div>
           );
         })}
       </nav>

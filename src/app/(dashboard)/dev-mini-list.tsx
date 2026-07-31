@@ -37,11 +37,11 @@ export function DevMiniList({
           >
             <span className="font-medium">{d.dev}</span>
             {metric === "passed" ? (
-              <span className="text-green-600 dark:text-green-400">
+              <span className="font-mono tabular-nums text-green-600 dark:text-green-400">
                 {d.passed} passed
               </span>
             ) : (
-              <span className="text-muted-foreground">
+              <span className="font-mono tabular-nums text-muted-foreground">
                 <span className="text-destructive">{d.failed} failed</span>
                 {" · "}
                 <span className="text-amber-600 dark:text-amber-400">
