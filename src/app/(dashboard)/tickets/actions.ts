@@ -10,12 +10,10 @@ import {
   testCaseInputSchema,
   ticketStatusSchema,
   testCaseStatusSchema,
-  importSchema,
   type TicketStatus,
   type TestCaseStatus,
-  type ImportPayload,
 } from "@/lib/validations";
-import { applyRollup } from "@/lib/rollup";
+import { recomputeRollup } from "@/lib/recompute-rollup";
 
 export interface ActionResult {
   error: string | null;
@@ -24,35 +22,6 @@ export interface ActionResult {
 function optionalFormValue(formData: FormData, key: string): string | null {
   const value = formData.get(key);
   return typeof value === "string" && value.trim() !== "" ? value : null;
-}
-
-async function recomputeRollup(ticketId: string) {
-  const ticket = await db.query.tickets.findFirst({
-    where: eq(tickets.id, ticketId),
-  });
-  if (!ticket) return;
-
-  const rows = await db
-    .select({ status: testCases.status })
-    .from(testCases)
-    .where(eq(testCases.ticketId, ticketId));
-
-  const { ticketStatus, failedCounter } = applyRollup({
-    currentStatus: ticket.ticketStatus,
-    manualOverride: ticket.manualOverride,
-    failedCounter: ticket.failedCounter,
-    testCaseStatuses: rows.map((r) => r.status),
-  });
-
-  if (
-    ticketStatus !== ticket.ticketStatus ||
-    failedCounter !== ticket.failedCounter
-  ) {
-    await db
-      .update(tickets)
-      .set({ ticketStatus, failedCounter, updatedAt: new Date() })
-      .where(eq(tickets.id, ticketId));
-  }
 }
 
 export interface CreateTicketState {
@@ -287,6 +256,24 @@ export async function setTicketDev(
   return { error: null };
 }
 
+export async function setTicketCreatedAt(
+  ticketId: string,
+  date: string
+): Promise<ActionResult> {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    return { error: "Must be a date in YYYY-MM-DD format." };
+  }
+
+  await db
+    .update(tickets)
+    .set({ createdAt: new Date(`${date}T00:00:00`), updatedAt: new Date() })
+    .where(eq(tickets.id, ticketId));
+
+  revalidatePath(`/tickets/${ticketId}`);
+  revalidatePath("/tickets");
+  return { error: null };
+}
+
 export async function retestTicket(ticketId: string): Promise<ActionResult> {
   const ticket = await db.query.tickets.findFirst({
     where: eq(tickets.id, ticketId),
@@ -336,68 +323,3 @@ export async function retestTicket(ticketId: string): Promise<ActionResult> {
   return { error: null };
 }
 
-export interface ImportResult {
-  error: string | null;
-  ticketId?: string;
-  title?: string;
-}
-
-export async function importTicket(
-  payload: ImportPayload
-): Promise<ImportResult> {
-  const parsed = importSchema.safeParse(payload);
-  if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid import payload." };
-  }
-
-  const { ticket: ticketInput, test_cases } = parsed.data;
-
-  const hasHistoricalStatus =
-    ticketInput.ticket_status !== undefined || ticketInput.failed_counter !== undefined;
-
-  const ticketId = await db.transaction(async (tx) => {
-    const [ticket] = await tx
-      .insert(tickets)
-      .values({
-        title: ticketInput.title,
-        company: ticketInput.company,
-        system: ticketInput.system,
-        module: ticketInput.module,
-        issueType: ticketInput.issue_type,
-        tester: ticketInput.tester,
-        dev: ticketInput.dev ?? null,
-        ...(hasHistoricalStatus
-          ? {
-              ticketStatus: ticketInput.ticket_status ?? "PENDING",
-              failedCounter: ticketInput.failed_counter ?? 0,
-              // Freeze the imported historical status so the rollup that
-              // runs right after inserting test cases doesn't recompute it.
-              manualOverride: true,
-            }
-          : {}),
-      })
-      .returning({ id: tickets.id });
-
-    await tx.insert(testCases).values(
-      test_cases.map((tc) => ({
-        ticketId: ticket.id,
-        tcNumber: tc.tc_number,
-        page: tc.page,
-        description: tc.description,
-        priority: tc.priority,
-        expectedResult: tc.expected_result,
-        actualResult: tc.actual_result ?? null,
-        comments: tc.comments ?? null,
-        status: tc.status,
-        testedDate: tc.tested_date ?? null,
-        tester: ticketInput.tester,
-      }))
-    );
-
-    return ticket.id;
-  });
-
-  await recomputeRollup(ticketId);
-  revalidatePath("/tickets");
-  return { error: null, ticketId, title: ticketInput.title };
-}
