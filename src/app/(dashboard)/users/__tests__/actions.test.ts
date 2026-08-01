@@ -68,6 +68,93 @@ describe("users actions reject non-admins", () => {
   });
 });
 
+describe("createUserAccount as admin", () => {
+  const createUserMock = vi.fn();
+
+  beforeEach(() => {
+    requireAdminMock.mockResolvedValue({ error: null });
+    createUserMock.mockReset();
+    createAdminClientMock.mockReturnValue({
+      auth: { admin: { createUser: createUserMock } },
+    });
+    insertValuesMock.mockClear();
+    insertMock.mockClear();
+  });
+
+  it("creates the user with the submitted role and returns success", async () => {
+    createUserMock.mockResolvedValue({
+      data: { user: { id: "new-user-id" } },
+      error: null,
+    });
+
+    const fd = new FormData();
+    fd.set("email", "new@example.com");
+    fd.set("password", "password123");
+    fd.set("role", "admin");
+
+    const result = await createUserAccount({ error: null }, fd);
+
+    expect(createUserMock).toHaveBeenCalledWith({
+      email: "new@example.com",
+      password: "password123",
+      email_confirm: true,
+    });
+    expect(insertMock).toHaveBeenCalledWith(profiles);
+    expect(insertValuesMock).toHaveBeenCalledWith({
+      id: "new-user-id",
+      email: "new@example.com",
+      role: "admin",
+    });
+    expect(result).toEqual({ error: null });
+  });
+
+  it("surfaces a Supabase error and never inserts a profile", async () => {
+    createUserMock.mockResolvedValue({
+      data: { user: null },
+      error: { message: "Email already registered" },
+    });
+
+    const fd = new FormData();
+    fd.set("email", "dup@example.com");
+    fd.set("password", "password123");
+    fd.set("role", "viewer");
+
+    const result = await createUserAccount({ error: null }, fd);
+
+    expect(result).toEqual({ error: "Email already registered" });
+    expect(insertMock).not.toHaveBeenCalled();
+  });
+
+  it("returns a friendly error instead of crashing when createAdminClient throws", async () => {
+    createAdminClientMock.mockImplementation(() => {
+      throw new Error("SUPABASE_SERVICE_ROLE_KEY is not set");
+    });
+
+    const fd = new FormData();
+    fd.set("email", "new@example.com");
+    fd.set("password", "password123");
+    fd.set("role", "viewer");
+
+    const result = await createUserAccount({ error: null }, fd);
+
+    expect(result).toEqual({ error: "Server is not configured for user creation." });
+    expect(insertMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects passwords under 8 characters before touching Supabase", async () => {
+    const fd = new FormData();
+    fd.set("email", "new@example.com");
+    fd.set("password", "short");
+    fd.set("role", "viewer");
+
+    const result = await createUserAccount({ error: null }, fd);
+
+    expect(result.error).toBeTruthy();
+    expect(createAdminClientMock).not.toHaveBeenCalled();
+    expect(insertMock).not.toHaveBeenCalled();
+  });
+});
+
 describe("updateUserRole as admin", () => {
   beforeEach(() => {
     requireAdminMock.mockResolvedValue({ error: null });
