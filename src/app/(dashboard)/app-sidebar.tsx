@@ -8,17 +8,20 @@ import {
   TicketIcon,
   UploadIcon,
   UsersIcon,
+  UserCogIcon,
   LogOutIcon,
   ChevronDownIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut } from "./actions";
+import { useRole } from "@/lib/auth/role-context";
 
 interface NavItem {
   href: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   children?: { href: string; label: string }[];
+  adminOnly?: boolean;
 }
 
 const NAV_ITEMS: NavItem[] = [
@@ -29,14 +32,17 @@ const NAV_ITEMS: NavItem[] = [
     icon: TicketIcon,
     children: [{ href: "/tickets/test-cases", label: "Test Cases" }],
   },
-  { href: "/import", label: "Import", icon: UploadIcon },
+  { href: "/import", label: "Import", icon: UploadIcon, adminOnly: true },
   { href: "/dev-performance", label: "Dev Performance", icon: UsersIcon },
+  { href: "/users", label: "Users", icon: UserCogIcon, adminOnly: true },
 ];
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const role = useRole();
+  const visibleItems = NAV_ITEMS.filter((item) => !item.adminOnly || role === "admin");
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(() =>
-    Object.fromEntries(NAV_ITEMS.filter((item) => item.children).map((item) => [item.href, true]))
+    Object.fromEntries(visibleItems.filter((item) => item.children).map((item) => [item.href, true]))
   );
 
   return (
@@ -51,7 +57,7 @@ export function AppSidebar() {
       </div>
 
       <nav className="flex flex-1 flex-col gap-1">
-        {NAV_ITEMS.map((item) => {
+        {visibleItems.map((item) => {
           const childActive =
             item.children?.some((child) => pathname.startsWith(child.href)) ?? false;
           const active = !childActive && pathname.startsWith(item.href);
