@@ -28,13 +28,19 @@ export async function createUserAccount(
     return { error: "Password must be at least 8 characters." };
   }
 
-  const admin = createAdminClient();
-  const { data, error } = await admin.auth.admin.createUser({
-    email,
-    password,
-    email_confirm: true,
-  });
+  let result;
+  try {
+    const admin = createAdminClient();
+    result = await admin.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+    });
+  } catch {
+    return { error: "Server is not configured for user creation." };
+  }
 
+  const { data, error } = result;
   if (error || !data.user) {
     return { error: error?.message ?? "Failed to create user." };
   }

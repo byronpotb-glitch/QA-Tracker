@@ -20,6 +20,18 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Environment Variables
+
+The following environment variables must be set (locally in `.env.local`, and in Vercel's Project Settings for production deployments):
+
+- `DATABASE_URL` — Postgres connection string used by Drizzle (`src/db/index.ts`).
+- `NEXT_PUBLIC_SUPABASE_URL` — Supabase project URL.
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Supabase anon/public key, used by the browser and server (session-scoped) clients.
+- `SUPABASE_SERVICE_ROLE_KEY` — Supabase service-role key. Required specifically for the `/users` page's account-creation feature (`src/lib/supabase/admin.ts`), which needs elevated privileges to create auth users. Without it, admin-initiated user creation fails with a friendly error instead of a crash.
+- `ANTHROPIC_API_KEY` — API key for Anthropic/Claude-powered functionality.
+
+Missing any of these will either fail fast at startup (`DATABASE_URL`) or surface as a handled error in the affected feature (`SUPABASE_SERVICE_ROLE_KEY`), rather than crashing the app outright.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
