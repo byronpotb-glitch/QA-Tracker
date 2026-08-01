@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { profiles } from "@/db/schema";
@@ -13,7 +14,7 @@ export interface CurrentUser {
   role: Role;
 }
 
-export async function getCurrentUser(): Promise<CurrentUser | null> {
+export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   const supabase = await createClient();
   const {
     data: { user },
@@ -29,7 +30,7 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
     email: user.email ?? "",
     role: resolveRole(profile),
   };
-}
+});
 
 export interface RoleCheckResult {
   error: string | null;
