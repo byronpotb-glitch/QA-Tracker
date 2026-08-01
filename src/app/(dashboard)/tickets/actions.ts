@@ -14,6 +14,7 @@ import {
   type TestCaseStatus,
 } from "@/lib/validations";
 import { recomputeRollup } from "@/lib/recompute-rollup";
+import { requireAdmin } from "@/lib/auth/roles";
 
 export interface ActionResult {
   error: string | null;
@@ -32,6 +33,9 @@ export async function createTicket(
   _prevState: CreateTicketState,
   formData: FormData
 ): Promise<CreateTicketState> {
+  const roleCheck = await requireAdmin();
+  if (roleCheck.error) return roleCheck;
+
   const parsed = ticketInputSchema.safeParse({
     title: formData.get("title"),
     company: formData.get("company"),
@@ -65,6 +69,9 @@ export async function addTestCase(
   ticketId: string,
   formData: FormData
 ): Promise<ActionResult> {
+  const roleCheck = await requireAdmin();
+  if (roleCheck.error) return roleCheck;
+
   const parsed = testCaseInputSchema.safeParse({
     tc_number: formData.get("tc_number"),
     page: formData.get("page"),
@@ -115,6 +122,9 @@ export async function updateTestCase(
   testCaseId: string,
   formData: FormData
 ): Promise<ActionResult> {
+  const roleCheck = await requireAdmin();
+  if (roleCheck.error) return roleCheck;
+
   const parsed = testCaseInputSchema.safeParse({
     tc_number: formData.get("tc_number"),
     page: formData.get("page"),
@@ -158,6 +168,9 @@ export async function updateTestCaseStatus(
   testCaseId: string,
   status: TestCaseStatus
 ): Promise<ActionResult> {
+  const roleCheck = await requireAdmin();
+  if (roleCheck.error) return roleCheck;
+
   const parsed = testCaseStatusSchema.safeParse(status);
   if (!parsed.success) {
     return { error: "Invalid status." };
@@ -178,6 +191,9 @@ export async function deleteTestCase(
   ticketId: string,
   testCaseId: string
 ): Promise<ActionResult> {
+  const roleCheck = await requireAdmin();
+  if (roleCheck.error) return roleCheck;
+
   await db.delete(testCases).where(eq(testCases.id, testCaseId));
 
   await recomputeRollup(ticketId);
@@ -190,6 +206,9 @@ export async function toggleManualOverride(
   ticketId: string,
   next: boolean
 ): Promise<ActionResult> {
+  const roleCheck = await requireAdmin();
+  if (roleCheck.error) return roleCheck;
+
   await db
     .update(tickets)
     .set({ manualOverride: next, updatedAt: new Date() })
@@ -209,6 +228,9 @@ export async function setTicketStatus(
   ticketId: string,
   status: TicketStatus
 ): Promise<ActionResult> {
+  const roleCheck = await requireAdmin();
+  if (roleCheck.error) return roleCheck;
+
   const parsed = ticketStatusSchema.safeParse(status);
   if (!parsed.success) {
     return { error: "Invalid status." };
@@ -244,6 +266,9 @@ export async function setTicketDev(
   ticketId: string,
   dev: string
 ): Promise<ActionResult> {
+  const roleCheck = await requireAdmin();
+  if (roleCheck.error) return roleCheck;
+
   const trimmed = dev.trim();
 
   await db
@@ -260,6 +285,9 @@ export async function setTicketCreatedAt(
   ticketId: string,
   date: string
 ): Promise<ActionResult> {
+  const roleCheck = await requireAdmin();
+  if (roleCheck.error) return roleCheck;
+
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
     return { error: "Must be a date in YYYY-MM-DD format." };
   }
@@ -275,6 +303,9 @@ export async function setTicketCreatedAt(
 }
 
 export async function retestTicket(ticketId: string): Promise<ActionResult> {
+  const roleCheck = await requireAdmin();
+  if (roleCheck.error) return roleCheck;
+
   const ticket = await db.query.tickets.findFirst({
     where: eq(tickets.id, ticketId),
     with: { testCases: true },
