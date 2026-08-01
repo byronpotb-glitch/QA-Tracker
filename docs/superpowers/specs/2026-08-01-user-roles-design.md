@@ -63,8 +63,11 @@ only, not sufficient on its own):
 - `tickets/actions.ts`: `createTicket`, `addTestCase`, `updateTestCase`,
   `updateTestCaseStatus`, `deleteTestCase`, `toggleManualOverride`,
   `setTicketStatus`, `setTicketDev`, `setTicketCreatedAt`, `retestTicket`
-- `import/actions.ts`: `applyExcelImport`, `cleanupExcelImport`
-  (`previewExcelImport` stays open — it doesn't write anything)
+- `import/actions.ts`: `previewExcelImport`, `applyExcelImport`,
+  `cleanupExcelImport` — only `applyExcelImport` actually writes to the
+  database; `previewExcelImport` and `cleanupExcelImport` are read-only
+  (the latter returns a cleaned `.xlsx` for download, never touches `db`).
+  All three are gated anyway since the whole Import feature is admin-only.
 - new `users/actions.ts`: `createUserAccount`, `updateUserRole`
 
 Page-level guards (redirect non-admins away entirely, not just hide buttons):
