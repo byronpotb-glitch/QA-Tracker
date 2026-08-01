@@ -83,7 +83,14 @@ New sidebar item "Users", rendered only when `getCurrentUser().role ===
 
 `/users` page:
 
-- Table of all `profiles` rows: email, role, created date.
+- Table of all `profiles` rows: email, role, created date. **Known
+  limitation:** this lists `profiles` rows, not raw Supabase accounts — any
+  pre-existing `auth.users` account without a matching `profiles` row (e.g.
+  `ui-preview-temp@example.com`, seen in this project before this feature
+  shipped) can still log in and gets `viewer` access by default, but won't
+  appear on this page. Giving it a role or making it visible here requires a
+  manual `profiles` row insert. Out of scope for this pass (matches "no
+  delete/deactivate" above) — revisit if this becomes a real pain point.
 - Inline role dropdown per row → `updateUserRole(userId, role)`. Blocked
   server-side if it would demote the last remaining admin (returns an error
   instead of applying the change).
