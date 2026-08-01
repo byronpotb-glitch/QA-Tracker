@@ -21,9 +21,9 @@ const insertMock = vi.fn((_table: unknown) => ({ values: insertValuesMock }));
 // `select: selectMock` would throw "Cannot access before initialization".
 vi.mock("@/db", () => ({
   db: {
-    select: (columns: unknown) => selectMock(columns),
-    insert: (table: unknown) => insertMock(table),
-    update: (table: unknown) => updateMock(table),
+    select: (_columns: unknown) => selectMock(_columns),
+    insert: (_table: unknown) => insertMock(_table),
+    update: (_table: unknown) => updateMock(_table),
   },
 }));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
