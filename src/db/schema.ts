@@ -44,6 +44,8 @@ export const testCaseStatusEnum = pgEnum("test_case_status", [
   "NOT_TESTED",
 ]);
 
+export const roleEnum = pgEnum("role", ["admin", "viewer"]);
+
 export const tickets = pgTable("tickets", {
   id: uuid("id").primaryKey().defaultRandom(),
   title: text("title").notNull(),
@@ -100,6 +102,13 @@ export const testCaseHistory = pgTable("test_case_history", {
   recordedAt: timestamp("recorded_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+export const profiles = pgTable("profiles", {
+  id: uuid("id").primaryKey(),
+  email: text("email").notNull(),
+  role: roleEnum("role").notNull().default("viewer"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const ticketsRelations = relations(tickets, ({ many }) => ({
   testCases: many(testCases),
 }));
@@ -124,3 +133,5 @@ export type NewTicket = typeof tickets.$inferInsert;
 export type TestCase = typeof testCases.$inferSelect;
 export type NewTestCase = typeof testCases.$inferInsert;
 export type TestCaseHistory = typeof testCaseHistory.$inferSelect;
+export type Profile = typeof profiles.$inferSelect;
+export type NewProfile = typeof profiles.$inferInsert;
