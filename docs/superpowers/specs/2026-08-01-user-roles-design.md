@@ -1,7 +1,7 @@
 # User Roles (Admin / Viewer) — Design
 
 **Date:** 2026-08-01
-**Status:** Approved
+**Status:** Implemented
 
 ## Problem
 
