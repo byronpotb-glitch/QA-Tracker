@@ -20,6 +20,7 @@ import { TestCaseRow } from "./test-case-row";
 import { DevField } from "./dev-field";
 import { CreatedDateField } from "./created-date-field";
 import { TestCaseHistoryDialog } from "./test-case-history-dialog";
+import { getCurrentUser } from "@/lib/auth/roles";
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   dateStyle: "medium",
@@ -32,6 +33,7 @@ export default async function TicketDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const currentUser = await getCurrentUser();
 
   const ticket = await db.query.tickets.findFirst({
     where: eq(tickets.id, id),
@@ -123,15 +125,17 @@ export default async function TicketDetailPage({
           </h2>
           <div className="flex items-center gap-2">
             <TestCaseHistoryDialog entries={historyEntries} />
-            <TestCaseDialog
-              ticketId={ticket.id}
-              trigger={
-                <Button size="sm">
-                  <PlusIcon />
-                  Add test case
-                </Button>
-              }
-            />
+            {currentUser?.role === "admin" && (
+              <TestCaseDialog
+                ticketId={ticket.id}
+                trigger={
+                  <Button size="sm">
+                    <PlusIcon />
+                    Add test case
+                  </Button>
+                }
+              />
+            )}
           </div>
         </div>
 

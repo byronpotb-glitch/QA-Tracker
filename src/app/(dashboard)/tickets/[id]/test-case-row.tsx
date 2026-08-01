@@ -12,9 +12,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PriorityBadge } from "@/lib/status";
+import { PriorityBadge, StatusBadge } from "@/lib/status";
 import { deleteTestCase, updateTestCaseStatus } from "../actions";
 import { TestCaseDialog } from "./test-case-dialog";
+import { useRole } from "@/lib/auth/role-context";
 import type { TestCase } from "@/db/schema";
 import type { TestCaseStatus } from "@/lib/validations";
 
@@ -34,6 +35,7 @@ export function TestCaseRow({
   ticketId: string;
   testCase: TestCase;
 }) {
+  const role = useRole();
   const [pending, startTransition] = useTransition();
 
   function handleStatusChange(value: string | null) {
@@ -68,47 +70,53 @@ export function TestCaseRow({
         <PriorityBadge priority={testCase.priority} />
       </TableCell>
       <TableCell>
-        <Select
-          value={testCase.status}
-          onValueChange={handleStatusChange}
-          disabled={pending}
-        >
-          <SelectTrigger size="sm" className="w-36">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {STATUSES.map((s) => (
-              <SelectItem key={s} value={s}>
-                {s.replace(/_/g, " ")}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {role === "admin" ? (
+          <Select
+            value={testCase.status}
+            onValueChange={handleStatusChange}
+            disabled={pending}
+          >
+            <SelectTrigger size="sm" className="w-36">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {STATUSES.map((s) => (
+                <SelectItem key={s} value={s}>
+                  {s.replace(/_/g, " ")}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        ) : (
+          <StatusBadge status={testCase.status} />
+        )}
       </TableCell>
       <TableCell className="text-muted-foreground">
         {testCase.testedDate ?? "—"}
       </TableCell>
       <TableCell>
-        <div className="flex items-center gap-1">
-          <TestCaseDialog
-            ticketId={ticketId}
-            testCase={testCase}
-            trigger={
-              <Button variant="ghost" size="icon-sm" aria-label="Edit test case">
-                <PencilIcon />
-              </Button>
-            }
-          />
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            aria-label="Delete test case"
-            onClick={handleDelete}
-            disabled={pending}
-          >
-            <Trash2Icon />
-          </Button>
-        </div>
+        {role === "admin" && (
+          <div className="flex items-center gap-1">
+            <TestCaseDialog
+              ticketId={ticketId}
+              testCase={testCase}
+              trigger={
+                <Button variant="ghost" size="icon-sm" aria-label="Edit test case">
+                  <PencilIcon />
+                </Button>
+              }
+            />
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              aria-label="Delete test case"
+              onClick={handleDelete}
+              disabled={pending}
+            >
+              <Trash2Icon />
+            </Button>
+          </div>
+        )}
       </TableCell>
     </TableRow>
   );

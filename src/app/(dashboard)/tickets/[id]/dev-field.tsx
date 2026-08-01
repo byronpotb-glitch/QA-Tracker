@@ -6,6 +6,7 @@ import { CheckIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { setTicketDev } from "../actions";
+import { useRole } from "@/lib/auth/role-context";
 
 export function DevField({
   ticketId,
@@ -14,6 +15,7 @@ export function DevField({
   ticketId: string;
   dev: string | null;
 }) {
+  const role = useRole();
   const [value, setValue] = useState(dev ?? "");
   const [pending, startTransition] = useTransition();
   const dirty = value.trim() !== (dev ?? "");
@@ -27,6 +29,10 @@ export function DevField({
       }
       toast.success("Dev updated");
     });
+  }
+
+  if (role !== "admin") {
+    return <span className="text-sm">{dev ?? "Unassigned"}</span>;
   }
 
   return (

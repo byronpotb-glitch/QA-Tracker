@@ -13,6 +13,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { setTicketCreatedAt } from "./actions";
+import { useRole } from "@/lib/auth/role-context";
 
 const dateOnlyFormatter = new Intl.DateTimeFormat("en-US", { dateStyle: "medium" });
 
@@ -30,6 +31,7 @@ export function CreatedDateCell({
   ticketId: string;
   createdAt: Date;
 }) {
+  const role = useRole();
   const initial = toDateInputValue(createdAt);
   const [value, setValue] = useState(initial);
   const [open, setOpen] = useState(false);
@@ -50,38 +52,40 @@ export function CreatedDateCell({
   return (
     <div className="flex items-center gap-1">
       <span>{dateOnlyFormatter.format(createdAt)}</span>
-      <Popover
-        open={open}
-        onOpenChange={(next) => {
-          setOpen(next);
-          if (next) setValue(initial);
-        }}
-      >
-        <PopoverTrigger
-          render={
-            <Button variant="ghost" size="icon-sm" aria-label="Edit created date">
-              <PencilIcon />
-            </Button>
-          }
-        />
-        <PopoverContent className="w-auto">
-          <PopoverHeader>
-            <PopoverTitle>Edit created date</PopoverTitle>
-          </PopoverHeader>
-          <div className="flex items-center gap-2">
-            <Input
-              type="date"
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              className="h-8 w-40"
-              disabled={pending}
-            />
-            <Button size="sm" onClick={handleSave} disabled={pending}>
-              Save
-            </Button>
-          </div>
-        </PopoverContent>
-      </Popover>
+      {role === "admin" && (
+        <Popover
+          open={open}
+          onOpenChange={(next) => {
+            setOpen(next);
+            if (next) setValue(initial);
+          }}
+        >
+          <PopoverTrigger
+            render={
+              <Button variant="ghost" size="icon-sm" aria-label="Edit created date">
+                <PencilIcon />
+              </Button>
+            }
+          />
+          <PopoverContent className="w-auto">
+            <PopoverHeader>
+              <PopoverTitle>Edit created date</PopoverTitle>
+            </PopoverHeader>
+            <div className="flex items-center gap-2">
+              <Input
+                type="date"
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                className="h-8 w-40"
+                disabled={pending}
+              />
+              <Button size="sm" onClick={handleSave} disabled={pending}>
+                Save
+              </Button>
+            </div>
+          </PopoverContent>
+        </Popover>
+      )}
     </div>
   );
 }

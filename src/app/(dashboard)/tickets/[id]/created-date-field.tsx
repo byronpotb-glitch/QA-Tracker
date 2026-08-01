@@ -6,6 +6,7 @@ import { CheckIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { setTicketCreatedAt } from "../actions";
+import { useRole } from "@/lib/auth/role-context";
 
 function toDateInputValue(date: Date): string {
   const y = date.getFullYear();
@@ -21,6 +22,7 @@ export function CreatedDateField({
   ticketId: string;
   createdAt: Date;
 }) {
+  const role = useRole();
   const initial = toDateInputValue(createdAt);
   const [value, setValue] = useState(initial);
   const [pending, startTransition] = useTransition();
@@ -35,6 +37,10 @@ export function CreatedDateField({
       }
       toast.success("Created date updated");
     });
+  }
+
+  if (role !== "admin") {
+    return <span className="text-sm">{initial}</span>;
   }
 
   return (

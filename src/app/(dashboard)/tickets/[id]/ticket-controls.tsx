@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { StatusBadge } from "@/lib/status";
 import { retestTicket, setTicketStatus, toggleManualOverride } from "../actions";
+import { useRole } from "@/lib/auth/role-context";
 import type { TicketStatus } from "@/lib/validations";
 
 const STATUSES: readonly TicketStatus[] = [
@@ -32,6 +33,7 @@ export function TicketControls({
   status: TicketStatus;
   manualOverride: boolean;
 }) {
+  const role = useRole();
   const [pending, startTransition] = useTransition();
 
   function handleToggle() {
@@ -62,13 +64,13 @@ export function TicketControls({
 
   return (
     <div className="flex flex-wrap items-center gap-3">
-      {status === "FAILED" && (
+      {role === "admin" && status === "FAILED" && (
         <Button size="sm" onClick={handleRetest} disabled={pending}>
           <RotateCcwIcon />
           Retest
         </Button>
       )}
-      {manualOverride ? (
+      {role === "admin" && manualOverride ? (
         <Select value={status} onValueChange={handleStatusChange} disabled={pending}>
           <SelectTrigger className="w-40">
             <SelectValue />
@@ -84,14 +86,16 @@ export function TicketControls({
       ) : (
         <StatusBadge status={status} className="h-7 px-3 text-sm" />
       )}
-      <Button
-        variant={manualOverride ? "secondary" : "outline"}
-        size="sm"
-        onClick={handleToggle}
-        disabled={pending}
-      >
-        {manualOverride ? "Manual override: ON" : "Manual override: OFF"}
-      </Button>
+      {role === "admin" && (
+        <Button
+          variant={manualOverride ? "secondary" : "outline"}
+          size="sm"
+          onClick={handleToggle}
+          disabled={pending}
+        >
+          {manualOverride ? "Manual override: ON" : "Manual override: OFF"}
+        </Button>
+      )}
       {!manualOverride && (
         <p className="text-xs text-muted-foreground">
           Status is computed automatically from test cases.

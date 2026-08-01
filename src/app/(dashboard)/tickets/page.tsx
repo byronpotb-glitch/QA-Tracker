@@ -14,6 +14,7 @@ import {
 import { StatusBadge } from "@/lib/status";
 import { TicketFilters } from "./ticket-filters";
 import { CreatedDateCell } from "./created-date-cell";
+import { getCurrentUser } from "@/lib/auth/roles";
 import type { Company, IssueType, TicketStatus } from "@/lib/validations";
 
 const COMPANIES: readonly Company[] = ["POTB", "GLADEX"];
@@ -50,6 +51,7 @@ export default async function TicketsPage({
   }>;
 }) {
   const params = await searchParams;
+  const currentUser = await getCurrentUser();
 
   const [systemRows, devRows] = await Promise.all([
     db.selectDistinct({ system: tickets.system }).from(tickets),
@@ -105,9 +107,11 @@ export default async function TicketsPage({
           >
             Test Cases
           </Button>
-          <Button nativeButton={false} render={<Link href="/tickets/new" />}>
-            New Ticket
-          </Button>
+          {currentUser?.role === "admin" && (
+            <Button nativeButton={false} render={<Link href="/tickets/new" />}>
+              New Ticket
+            </Button>
+          )}
         </div>
       </div>
 
