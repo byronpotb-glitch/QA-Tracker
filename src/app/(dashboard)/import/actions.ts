@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { eq, max } from "drizzle-orm";
 import { db } from "@/db";
+import { requireAdmin } from "@/lib/auth/roles";
 import { tickets, testCases, testCaseHistory } from "@/db/schema";
 import { recomputeRollup } from "@/lib/recompute-rollup";
 import {
@@ -284,6 +285,9 @@ function toReport(parsed: ParseResult, result: ReconcileResult): PreviewReport {
 export async function previewExcelImport(
   formData: FormData
 ): Promise<PreviewReport> {
+  const roleCheck = await requireAdmin();
+  if (roleCheck.error) return fileErrorReport(roleCheck.error);
+
   const upload = await parseUpload(formData);
   if ("error" in upload) return fileErrorReport(upload.error);
 
@@ -297,6 +301,9 @@ export async function previewExcelImport(
 export async function applyExcelImport(
   formData: FormData
 ): Promise<ApplyResult> {
+  const roleCheck = await requireAdmin();
+  if (roleCheck.error) return roleCheck;
+
   const upload = await parseUpload(formData);
   if ("error" in upload) return { error: upload.error };
 
@@ -492,6 +499,17 @@ export interface CleanupReport {
  * file without risk of a bad guess landing in the tracker.
  */
 export async function cleanupExcelImport(formData: FormData): Promise<CleanupReport> {
+  const roleCheck = await requireAdmin();
+  if (roleCheck.error) {
+    return {
+      fileErrors: [roleCheck.error],
+      sheetName: null,
+      fixes: [],
+      remainingIssues: [],
+      removedRowNumbers: [],
+    };
+  }
+
   const upload = readUploadedFile(formData);
   if ("error" in upload) {
     return {
