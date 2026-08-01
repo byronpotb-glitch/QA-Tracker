@@ -11,9 +11,13 @@ type ProfileRow = { id: string; role: string };
 const selectFromMock = vi.fn(() => Promise.resolve([] as ProfileRow[]));
 const insertValuesMock = vi.fn(() => Promise.resolve());
 const updateWhereMock = vi.fn(() => Promise.resolve());
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const updateSetMock = vi.fn((_values: unknown) => ({ where: updateWhereMock }));
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const updateMock = vi.fn((_table: unknown) => ({ set: updateSetMock }));
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const selectMock = vi.fn((_columns: unknown) => ({ from: selectFromMock }));
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const insertMock = vi.fn((_table: unknown) => ({ values: insertValuesMock }));
 
 // Note: these wrappers must stay lazy (not bare identifier references) —
@@ -21,9 +25,9 @@ const insertMock = vi.fn((_table: unknown) => ({ values: insertValuesMock }));
 // `select: selectMock` would throw "Cannot access before initialization".
 vi.mock("@/db", () => ({
   db: {
-    select: (_columns: unknown) => selectMock(_columns),
-    insert: (_table: unknown) => insertMock(_table),
-    update: (_table: unknown) => updateMock(_table),
+    select: (columns: unknown) => selectMock(columns),
+    insert: (table: unknown) => insertMock(table),
+    update: (table: unknown) => updateMock(table),
   },
 }));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
