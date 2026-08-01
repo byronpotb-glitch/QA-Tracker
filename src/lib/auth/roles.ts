@@ -2,13 +2,10 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { profiles } from "@/db/schema";
 import { createClient } from "@/lib/supabase/server";
-import type { Role } from "@/lib/auth/role-guard";
+import { resolveRole, type Role } from "@/lib/auth/role-guard";
 
 export type { Role };
-
-export function resolveRole(profileRow: { role: Role } | undefined): Role {
-  return profileRow?.role ?? "viewer";
-}
+export { resolveRole };
 
 export interface CurrentUser {
   id: string;

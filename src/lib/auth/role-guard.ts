@@ -1,6 +1,14 @@
 export type Role = "admin" | "viewer";
 
 /**
+ * Resolves a user's role from their profile row.
+ * Defaults to "viewer" if no profile exists.
+ */
+export function resolveRole(profileRow: { role: Role } | undefined): Role {
+  return profileRow?.role ?? "viewer";
+}
+
+/**
  * Blocks demoting the last remaining admin — everything else is allowed.
  */
 export function canChangeRole(
