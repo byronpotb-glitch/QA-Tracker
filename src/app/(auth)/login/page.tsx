@@ -1,32 +1,49 @@
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoginForm } from "./login-form";
+import { LoginStatusStrip } from "./login-status-strip";
+import { plexSans } from "./fonts";
 
 export default function LoginPage() {
   return (
-    <div className="relative flex flex-1 items-center justify-center overflow-hidden bg-zinc-50 p-4">
+    <div
+      className={`${plexSans.className} relative flex flex-1 items-center justify-center overflow-hidden bg-[#F7F8FA] p-4`}
+    >
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
         style={{
-          backgroundImage:
-            "radial-gradient(circle at 12% 8%, rgba(99,102,241,0.14), transparent 42%), radial-gradient(circle at 92% 95%, rgba(99,102,241,0.10), transparent 45%)",
+          backgroundImage: "radial-gradient(#101828 1px, transparent 1px)",
+          backgroundSize: "20px 20px",
+          opacity: 0.05,
+          maskImage:
+            "radial-gradient(ellipse 60% 55% at 50% 40%, transparent 25%, black 85%)",
+          WebkitMaskImage:
+            "radial-gradient(ellipse 60% 55% at 50% 40%, transparent 25%, black 85%)",
         }}
       />
-      <div className="relative flex w-full max-w-sm flex-col items-center gap-6">
+
+      <div className="motion-safe:animate-in motion-safe:fade-in-0 motion-safe:zoom-in-95 motion-safe:duration-500 relative flex w-full max-w-sm flex-col items-center gap-6">
         <Image
           src="/logo.png"
           alt="QA Test Case Tracker"
           width={1254}
           height={1254}
           priority
-          className="size-14"
+          className="size-12"
         />
-        <Card className="w-full rounded-2xl border-0 shadow-xl shadow-zinc-950/10 ring-0">
-          <CardHeader>
-            <CardTitle className="text-center">QA Test Case Tracker</CardTitle>
+
+        <Card className="w-full gap-0 overflow-hidden rounded-xl border border-[#E4E7EC] p-0 py-0 shadow-[0_1px_2px_rgba(16,24,40,0.04),0_8px_24px_-8px_rgba(16,24,40,0.10)] ring-0">
+          <LoginStatusStrip />
+
+          <CardHeader className="px-5 pt-5">
+            <CardTitle
+              className={`${plexSans.className} text-center text-[17px] font-semibold tracking-tight text-[#101828]`}
+            >
+              Quality Assurance Tester Tracker
+            </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-5 pb-5">
             <LoginForm />
           </CardContent>
         </Card>
