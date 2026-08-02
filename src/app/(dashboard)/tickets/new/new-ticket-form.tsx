@@ -12,12 +12,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { createTicket, type CreateTicketState } from "../actions";
+import type { ProjectRow } from "@/db/schema";
 
 const initialState: CreateTicketState = { error: null };
 
+const COMPANIES = ["POTB", "GLADEX"] as const;
 const ISSUE_TYPES = ["BUG", "FEATURE", "IMPROVEMENT", "CHANGE_REQUEST"] as const;
 
-export function NewTicketForm() {
+export function NewTicketForm({ projects }: { projects: ProjectRow[] }) {
   const [state, formAction, pending] = useActionState(
     createTicket,
     initialState
@@ -38,8 +40,11 @@ export function NewTicketForm() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="POTB">POTB</SelectItem>
-              <SelectItem value="GLADEX">GLADEX</SelectItem>
+              {COMPANIES.map((c) => (
+                <SelectItem key={c} value={c}>
+                  {c}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -64,7 +69,18 @@ export function NewTicketForm() {
       <div className="grid grid-cols-2 gap-3">
         <div className="flex flex-col gap-2">
           <Label htmlFor="system">System</Label>
-          <Input id="system" name="system" required />
+          <Select name="system" defaultValue={projects[0]?.name}>
+            <SelectTrigger id="system" className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {projects.map((p) => (
+                <SelectItem key={p.id} value={p.name}>
+                  {p.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div className="flex flex-col gap-2">
           <Label htmlFor="module">Module</Label>

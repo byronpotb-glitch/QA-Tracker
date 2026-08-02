@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { and, desc, eq, ilike, isNotNull } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, isNotNull, or, sql } from "drizzle-orm";
 import { ArrowLeftIcon } from "lucide-react";
 import { db } from "@/db";
-import { tickets } from "@/db/schema";
+import { testCases, tickets } from "@/db/schema";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -14,6 +14,11 @@ import {
 } from "@/components/ui/table";
 import { PriorityBadge, StatusBadge } from "@/lib/status";
 import { TicketFilters } from "../ticket-filters";
+import { PaginationControls } from "@/components/pagination-controls";
+import { PageSizeSelect } from "@/components/page-size-select";
+import { PAGE_SIZE_OPTIONS, DEFAULT_PAGE_SIZE } from "@/lib/page-size";
+import { getProjects } from "@/lib/projects";
+import { dedupeDevNames } from "@/lib/dev-performance";
 import type { Company, IssueType, TestCaseStatus, TicketStatus } from "@/lib/validations";
 
 export const dynamic = "force-dynamic";
@@ -52,26 +57,47 @@ export default async function AllTestCasesPage({
     issue_type?: string;
     dev?: string;
     tc_status?: string;
+    page?: string;
+    pageSize?: string;
   }>;
 }) {
   const params = await searchParams;
+  const page = Math.max(1, Number(params.page) || 1);
+  const requestedPageSize = Number(params.pageSize);
+  const pageSize = (PAGE_SIZE_OPTIONS as readonly number[]).includes(requestedPageSize)
+    ? requestedPageSize
+    : DEFAULT_PAGE_SIZE;
 
-  const [systemRows, devRows] = await Promise.all([
-    db.selectDistinct({ system: tickets.system }).from(tickets),
+  const [projects, devRows] = await Promise.all([
+    getProjects(),
     db
       .selectDistinct({ dev: tickets.dev })
       .from(tickets)
       .where(isNotNull(tickets.dev)),
   ]);
-  const systems = systemRows.map((r) => r.system).sort();
-  const devs = devRows
-    .map((r) => r.dev)
-    .filter((d): d is string => d !== null)
-    .sort();
+  const systems = projects.map((p) => p.name);
+  const devs = dedupeDevNames(devRows.map((r) => r.dev).filter((d): d is string => d !== null));
 
   const filters = [];
   if (params.q && params.q.trim()) {
-    filters.push(ilike(tickets.title, `%${params.q.trim()}%`));
+    const q = `%${params.q.trim()}%`;
+    const matchingTestCaseTickets = await db
+      .selectDistinct({ ticketId: testCases.ticketId })
+      .from(testCases)
+      .where(or(ilike(testCases.tcNumber, q), ilike(testCases.description, q)));
+    const qFilters = [
+      ilike(tickets.title, q),
+      ilike(tickets.system, q),
+      ilike(tickets.module, q),
+      ilike(tickets.tester, q),
+      ilike(tickets.dev, q),
+    ];
+    if (matchingTestCaseTickets.length) {
+      qFilters.push(
+        inArray(tickets.id, matchingTestCaseTickets.map((r) => r.ticketId))
+      );
+    }
+    filters.push(or(...qFilters));
   }
   if (params.company && COMPANIES.includes(params.company as Company)) {
     filters.push(eq(tickets.company, params.company as Company));
@@ -86,14 +112,21 @@ export default async function AllTestCasesPage({
     filters.push(eq(tickets.issueType, params.issue_type as IssueType));
   }
   if (params.dev) {
-    filters.push(eq(tickets.dev, params.dev));
+    filters.push(ilike(tickets.dev, params.dev));
   }
 
-  const allTickets = await db.query.tickets.findMany({
-    where: filters.length ? and(...filters) : undefined,
-    with: { testCases: true },
-    orderBy: desc(tickets.updatedAt),
-  });
+  const whereClause = filters.length ? and(...filters) : undefined;
+
+  const [allTickets, [{ count: totalCount }]] = await Promise.all([
+    db.query.tickets.findMany({
+      where: whereClause,
+      with: { testCases: true },
+      orderBy: desc(tickets.updatedAt),
+      limit: pageSize,
+      offset: (page - 1) * pageSize,
+    }),
+    db.select({ count: sql<number>`count(*)::int` }).from(tickets).where(whereClause),
+  ]);
 
   const tcStatus =
     params.tc_status && TEST_CASE_STATUSES.includes(params.tc_status as TestCaseStatus)
@@ -157,6 +190,10 @@ export default async function AllTestCasesPage({
           </Link>
         </div>
       )}
+
+      <div className="flex items-center justify-end">
+        <PageSizeSelect pageSize={pageSize} />
+      </div>
 
       {ticketsWithTestCases.length === 0 ? (
         <Card>
@@ -235,6 +272,14 @@ export default async function AllTestCasesPage({
           ))}
         </div>
       )}
+
+      <PaginationControls
+        basePath="/tickets/test-cases"
+        searchParams={params}
+        page={page}
+        pageSize={pageSize}
+        totalCount={totalCount}
+      />
     </div>
   );
 }

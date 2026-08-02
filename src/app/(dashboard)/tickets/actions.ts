@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
-import { tickets, testCases, testCaseHistory } from "@/db/schema";
+import { tickets, testCases, testCaseHistory, ticketAuditLog } from "@/db/schema";
 import {
   ticketInputSchema,
   testCaseInputSchema,
@@ -14,7 +14,26 @@ import {
   type TestCaseStatus,
 } from "@/lib/validations";
 import { recomputeRollup } from "@/lib/recompute-rollup";
-import { requireAdmin } from "@/lib/auth/roles";
+import { requireAdmin, getCurrentUser } from "@/lib/auth/roles";
+import { getProjects } from "@/lib/projects";
+import { notify } from "@/lib/notifications";
+
+async function logTicketChange(
+  ticketId: string,
+  field: string,
+  oldValue: string | null,
+  newValue: string | null
+): Promise<void> {
+  if (oldValue === newValue) return;
+  const user = await getCurrentUser();
+  await db.insert(ticketAuditLog).values({
+    ticketId,
+    field,
+    oldValue,
+    newValue,
+    changedBy: user?.email ?? "unknown",
+  });
+}
 
 export interface ActionResult {
   error: string | null;
@@ -47,6 +66,11 @@ export async function createTicket(
 
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Invalid input." };
+  }
+
+  const projects = await getProjects();
+  if (!projects.some((p) => p.name === parsed.data.system)) {
+    return { error: `"${parsed.data.system}" is not a known project.` };
   }
 
   const [ticket] = await db
@@ -202,6 +226,17 @@ export async function deleteTestCase(
   return { error: null };
 }
 
+export async function deleteTicket(ticketId: string): Promise<ActionResult> {
+  const roleCheck = await requireAdmin();
+  if (roleCheck.error) return roleCheck;
+
+  await db.delete(tickets).where(eq(tickets.id, ticketId));
+
+  revalidatePath("/tickets");
+  revalidatePath("/tickets/test-cases");
+  redirect("/tickets");
+}
+
 export async function toggleManualOverride(
   ticketId: string,
   next: boolean
@@ -213,6 +248,7 @@ export async function toggleManualOverride(
     .update(tickets)
     .set({ manualOverride: next, updatedAt: new Date() })
     .where(eq(tickets.id, ticketId));
+  await logTicketChange(ticketId, "manual_override", String(!next), String(next));
 
   if (!next) {
     // Turning override off resumes automatic rollup immediately.
@@ -256,6 +292,7 @@ export async function setTicketStatus(
       updatedAt: new Date(),
     })
     .where(eq(tickets.id, ticketId));
+  await logTicketChange(ticketId, "ticket_status", ticket.ticketStatus, parsed.data);
 
   revalidatePath(`/tickets/${ticketId}`);
   revalidatePath("/tickets");
@@ -270,11 +307,23 @@ export async function setTicketDev(
   if (roleCheck.error) return roleCheck;
 
   const trimmed = dev.trim();
+  const next = trimmed === "" ? null : trimmed;
+
+  const ticket = await db.query.tickets.findFirst({
+    where: eq(tickets.id, ticketId),
+  });
+  if (!ticket) {
+    return { error: "Ticket not found." };
+  }
 
   await db
     .update(tickets)
-    .set({ dev: trimmed === "" ? null : trimmed, updatedAt: new Date() })
+    .set({ dev: next, updatedAt: new Date() })
     .where(eq(tickets.id, ticketId));
+  await logTicketChange(ticketId, "dev", ticket.dev, next);
+  if (next && next !== ticket.dev) {
+    await notify(`Ticket "${ticket.title}" assigned to ${next}.`, ticketId);
+  }
 
   revalidatePath(`/tickets/${ticketId}`);
   revalidatePath("/tickets");
@@ -292,10 +341,23 @@ export async function setTicketCreatedAt(
     return { error: "Must be a date in YYYY-MM-DD format." };
   }
 
+  const ticket = await db.query.tickets.findFirst({
+    where: eq(tickets.id, ticketId),
+  });
+  if (!ticket) {
+    return { error: "Ticket not found." };
+  }
+
   await db
     .update(tickets)
     .set({ createdAt: new Date(`${date}T00:00:00`), updatedAt: new Date() })
     .where(eq(tickets.id, ticketId));
+  await logTicketChange(
+    ticketId,
+    "created_at",
+    ticket.createdAt.toISOString(),
+    new Date(`${date}T00:00:00`).toISOString()
+  );
 
   revalidatePath(`/tickets/${ticketId}`);
   revalidatePath("/tickets");
@@ -347,6 +409,7 @@ export async function retestTicket(ticketId: string): Promise<ActionResult> {
         .where(eq(testCases.id, tc.id));
     }
   });
+  await logTicketChange(ticketId, "retest", null, `round ${ticket.failedCounter}`);
 
   await recomputeRollup(ticketId);
   revalidatePath(`/tickets/${ticketId}`);

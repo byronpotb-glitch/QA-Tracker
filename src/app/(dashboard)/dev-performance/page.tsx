@@ -1,33 +1,46 @@
-import Link from "next/link";
+import { and, gte, lte } from "drizzle-orm";
 import { TrendingUpIcon, TrendingDownIcon } from "lucide-react";
 import { db } from "@/db";
 import { tickets } from "@/db/schema";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import {
   computeDevPerformance,
   sortByHighPerformance,
   sortByLowPerformance,
 } from "@/lib/dev-performance";
 import { DevMiniList } from "../dev-mini-list";
+import { DashboardDateFilter, type DateField } from "../dashboard/date-filter";
+import { AllDevsTable } from "./all-devs-table";
 
 export const dynamic = "force-dynamic";
 
-export default async function DevPerformancePage() {
+export default async function DevPerformancePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ from?: string; to?: string; field?: string }>;
+}) {
+  const params = await searchParams;
+  const dateField: DateField = params.field === "updated" ? "updated" : "created";
+  const dateColumn = dateField === "updated" ? tickets.updatedAt : tickets.createdAt;
+
+  const dateRange =
+    params.from && params.to
+      ? {
+          from: new Date(`${params.from}T00:00:00`),
+          to: new Date(`${params.to}T23:59:59.999`),
+        }
+      : null;
+
   const rows = await db
     .select({
       dev: tickets.dev,
       ticketStatus: tickets.ticketStatus,
       failedCounter: tickets.failedCounter,
     })
-    .from(tickets);
+    .from(tickets)
+    .where(
+      dateRange ? and(gte(dateColumn, dateRange.from), lte(dateColumn, dateRange.to)) : undefined
+    );
 
   const performance = computeDevPerformance(rows);
   const topPerformers = sortByHighPerformance(
@@ -38,12 +51,15 @@ export default async function DevPerformancePage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-lg font-semibold">Dev Performance</h1>
-        <p className="text-sm text-muted-foreground">
-          Tickets grouped by assigned dev — click any number to see the
-          underlying tickets.
-        </p>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="text-lg font-semibold">Dev Performance</h1>
+          <p className="text-sm text-muted-foreground">
+            Tickets grouped by assigned dev — click any number to see the
+            underlying tickets.
+          </p>
+        </div>
+        <DashboardDateFilter from={params.from} to={params.to} field={dateField} />
       </div>
 
       {performance.length === 0 ? (
@@ -73,53 +89,7 @@ export default async function DevPerformancePage() {
 
           <div className="flex flex-col gap-3">
             <h2 className="text-base font-semibold">All Devs</h2>
-            <div className="rounded-xl ring-1 ring-foreground/10">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Dev</TableHead>
-                    <TableHead className="text-right">Total</TableHead>
-                    <TableHead className="text-right">Passed</TableHead>
-                    <TableHead className="text-right">Failed</TableHead>
-                    <TableHead className="text-right">Recurring</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {allDevs.map((d) => {
-                    const base = `/tickets?dev=${encodeURIComponent(d.dev)}`;
-                    return (
-                      <TableRow key={d.dev}>
-                        <TableCell className="font-medium">
-                          <Link href={base} className="hover:underline">
-                            {d.dev}
-                          </Link>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Link href={base} className="hover:underline">
-                            {d.total}
-                          </Link>
-                        </TableCell>
-                        <TableCell className="text-right text-green-600 dark:text-green-400">
-                          <Link href={`${base}&status=PASSED`} className="hover:underline">
-                            {d.passed}
-                          </Link>
-                        </TableCell>
-                        <TableCell className="text-right text-destructive">
-                          <Link href={`${base}&status=FAILED`} className="hover:underline">
-                            {d.failed}
-                          </Link>
-                        </TableCell>
-                        <TableCell className="text-right text-amber-600 dark:text-amber-400">
-                          <Link href={`${base}&recurring=1`} className="hover:underline">
-                            {d.recurring}
-                          </Link>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </div>
+            <AllDevsTable devs={allDevs} />
           </div>
         </>
       )}

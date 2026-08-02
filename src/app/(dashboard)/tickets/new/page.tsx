@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getCurrentUser } from "@/lib/auth/roles";
+import { getProjects } from "@/lib/projects";
 import { NewTicketForm } from "./new-ticket-form";
 
 export default async function NewTicketPage() {
@@ -9,6 +10,8 @@ export default async function NewTicketPage() {
     redirect("/dashboard");
   }
 
+  const projects = await getProjects();
+
   return (
     <div className="mx-auto w-full max-w-lg">
       <Card>
@@ -16,7 +19,7 @@ export default async function NewTicketPage() {
           <CardTitle>New Ticket</CardTitle>
         </CardHeader>
         <CardContent>
-          <NewTicketForm />
+          <NewTicketForm projects={projects} />
         </CardContent>
       </Card>
     </div>

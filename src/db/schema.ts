@@ -10,8 +10,6 @@ import {
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
-export const companyEnum = pgEnum("company", ["POTB", "GLADEX"]);
-
 export const issueTypeEnum = pgEnum("issue_type", [
   "BUG",
   "FEATURE",
@@ -46,10 +44,20 @@ export const testCaseStatusEnum = pgEnum("test_case_status", [
 
 export const roleEnum = pgEnum("role", ["admin", "viewer"]);
 
+// Admin-configurable list of systems/projects tickets can belong to.
+export const projects = pgTable("projects", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull().unique(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const tickets = pgTable("tickets", {
   id: uuid("id").primaryKey().defaultRandom(),
   title: text("title").notNull(),
-  company: companyEnum("company").notNull(),
+  // Only two companies exist and that isn't expected to change; kept as a
+  // plain validated string (see companySchema) rather than an admin-managed
+  // table or DB enum.
+  company: text("company").notNull(),
   system: text("system").notNull(),
   module: text("module").notNull(),
   issueType: issueTypeEnum("issue_type").notNull(),
@@ -102,6 +110,32 @@ export const testCaseHistory = pgTable("test_case_history", {
   recordedAt: timestamp("recorded_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+// One row per ticket-level field edit (dev reassignment, manual status
+// override, created-date correction, retest). Test-case-level history is
+// tracked separately in testCaseHistory.
+export const ticketAuditLog = pgTable("ticket_audit_log", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  ticketId: uuid("ticket_id")
+    .notNull()
+    .references(() => tickets.id, { onDelete: "cascade" }),
+  field: text("field").notNull(),
+  oldValue: text("old_value"),
+  newValue: text("new_value"),
+  changedBy: text("changed_by").notNull(),
+  changedAt: timestamp("changed_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+// Shared, org-wide activity feed (not per-user — ticket.dev is a free-text
+// name, not reliably tied to a profiles row, so there's no clean per-user
+// target). "read" is a single shared flag, same visibility model as tickets.
+export const notifications = pgTable("notifications", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  ticketId: uuid("ticket_id").references(() => tickets.id, { onDelete: "cascade" }),
+  message: text("message").notNull(),
+  read: boolean("read").notNull().default(false),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const profiles = pgTable("profiles", {
   id: uuid("id").primaryKey(),
   email: text("email").notNull(),
@@ -111,6 +145,14 @@ export const profiles = pgTable("profiles", {
 
 export const ticketsRelations = relations(tickets, ({ many }) => ({
   testCases: many(testCases),
+  auditLog: many(ticketAuditLog),
+}));
+
+export const ticketAuditLogRelations = relations(ticketAuditLog, ({ one }) => ({
+  ticket: one(tickets, {
+    fields: [ticketAuditLog.ticketId],
+    references: [tickets.id],
+  }),
 }));
 
 export const testCasesRelations = relations(testCases, ({ one, many }) => ({
@@ -133,5 +175,8 @@ export type NewTicket = typeof tickets.$inferInsert;
 export type TestCase = typeof testCases.$inferSelect;
 export type NewTestCase = typeof testCases.$inferInsert;
 export type TestCaseHistory = typeof testCaseHistory.$inferSelect;
+export type TicketAuditLog = typeof ticketAuditLog.$inferSelect;
 export type Profile = typeof profiles.$inferSelect;
 export type NewProfile = typeof profiles.$inferInsert;
+export type ProjectRow = typeof projects.$inferSelect;
+export type Notification = typeof notifications.$inferSelect;

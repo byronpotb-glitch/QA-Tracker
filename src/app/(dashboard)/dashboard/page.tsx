@@ -33,6 +33,7 @@ import { DashboardCompanyFilter } from "./company-filter";
 import type { Company, TicketStatus, TestCaseStatus } from "@/lib/validations";
 
 const COMPANIES: readonly Company[] = ["POTB", "GLADEX"];
+const RECURRING_PREVIEW_LIMIT = 5;
 
 export const dynamic = "force-dynamic";
 
@@ -121,7 +122,9 @@ export default async function DashboardPage({
       .groupBy(tickets.company),
   ]);
 
-  const companyCountMap = new Map(companyRows.map((r) => [r.company, r.count]));
+  const companyCountMap = new Map(
+    companyRows.map((r) => [r.company as Company, r.count])
+  );
 
   const devPerformance = computeDevPerformance(devRows);
   const topPerformers = sortByHighPerformance(
@@ -257,12 +260,23 @@ export default async function DashboardPage({
       </div>
 
       <div className="flex flex-col gap-3">
-        <div>
-          <h2 className="text-base font-semibold">Recurring failures</h2>
-          <p className="text-sm text-muted-foreground">
-            Tickets that failed, went back to dev, and came back for another
-            round of testing — sorted by how many times they&apos;ve failed.
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-base font-semibold">Recurring failures</h2>
+            <p className="text-sm text-muted-foreground">
+              Tickets that failed, went back to dev, and came back for another
+              round of testing — sorted by how many times they&apos;ve failed.
+            </p>
+          </div>
+          {recurringFailures.length > RECURRING_PREVIEW_LIMIT && (
+            <Link
+              href={`/tickets?recurring=1${company ? `&${companyQueryParam}` : ""}`}
+              className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+            >
+              View all ({recurringFailures.length})
+              <ArrowRightIcon className="size-3.5" />
+            </Link>
+          )}
         </div>
         <div className="rounded-xl ring-1 ring-foreground/10">
           <Table>
@@ -285,7 +299,7 @@ export default async function DashboardPage({
                   </TableCell>
                 </TableRow>
               )}
-              {recurringFailures.map((ticket) => (
+              {recurringFailures.slice(0, RECURRING_PREVIEW_LIMIT).map((ticket) => (
                 <TableRow key={ticket.id}>
                   <TableCell className="max-w-72 truncate">
                     <Link
@@ -402,20 +416,22 @@ function StatTile({
   }[tone];
 
   return (
-    <Link href={href} className="block">
-      <Card className="transition-shadow hover:shadow-md hover:ring-foreground/20">
-        <CardContent className="flex flex-col gap-3">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">{label}</span>
-            <div
-              className={`flex size-8 shrink-0 items-center justify-center rounded-lg ${toneClasses.iconBg}`}
-            >
-              <Icon className="size-4" />
+    <Link href={href} className="block h-full">
+      <Card className="h-full transition-shadow hover:shadow-md hover:ring-foreground/20">
+        <CardContent className="flex h-full flex-col justify-between gap-3">
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">{label}</span>
+              <div
+                className={`flex size-8 shrink-0 items-center justify-center rounded-lg ${toneClasses.iconBg}`}
+              >
+                <Icon className="size-4" />
+              </div>
             </div>
+            <span className="font-mono text-2xl font-semibold tabular-nums">
+              {value.toLocaleString()}
+            </span>
           </div>
-          <span className="font-mono text-2xl font-semibold tabular-nums">
-            {value.toLocaleString()}
-          </span>
           {percent !== undefined && (
             <div className="flex items-center gap-2">
               <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">

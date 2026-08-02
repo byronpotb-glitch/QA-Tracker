@@ -5,7 +5,13 @@ import { ArrowLeftIcon, PlusIcon } from "lucide-react";
 import { db } from "@/db";
 import { tickets } from "@/db/schema";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -20,6 +26,8 @@ import { TestCaseRow } from "./test-case-row";
 import { DevField } from "./dev-field";
 import { CreatedDateField } from "./created-date-field";
 import { TestCaseHistoryDialog } from "./test-case-history-dialog";
+import { TicketAuditLogDialog } from "./ticket-audit-log-dialog";
+import { DeleteTicketButton } from "./delete-ticket-button";
 import { getCurrentUser } from "@/lib/auth/roles";
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
@@ -37,7 +45,7 @@ export default async function TicketDetailPage({
 
   const ticket = await db.query.tickets.findFirst({
     where: eq(tickets.id, id),
-    with: { testCases: { with: { history: true } } },
+    with: { testCases: { with: { history: true } }, auditLog: true },
   });
 
   if (!ticket) {
@@ -65,6 +73,12 @@ export default async function TicketDetailPage({
       <Card>
         <CardHeader>
           <CardTitle className="text-xl">{ticket.title}</CardTitle>
+          <CardAction className="flex items-center gap-2">
+            <TicketAuditLogDialog entries={ticket.auditLog} />
+            {currentUser?.role === "admin" && (
+              <DeleteTicketButton ticketId={ticket.id} ticketTitle={ticket.title} />
+            )}
+          </CardAction>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <TicketControls

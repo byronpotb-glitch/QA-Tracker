@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { tickets, testCases } from "@/db/schema";
 import { applyRollup } from "@/lib/rollup";
+import { notify } from "@/lib/notifications";
 
 /**
  * Recomputes one ticket's status/failedCounter from its test cases and writes
@@ -39,4 +40,10 @@ export async function recomputeRollup(ticketId: string): Promise<void> {
     .update(tickets)
     .set({ ticketStatus, failedCounter, updatedAt: new Date() })
     .where(eq(tickets.id, ticketId));
+
+  const enteringFailed = ticketStatus === "FAILED" && ticket.ticketStatus !== "FAILED";
+  if (enteringFailed) {
+    const suffix = failedCounter > 1 ? ` (round ${failedCounter})` : "";
+    await notify(`Ticket "${ticket.title}" failed${suffix}.`, ticketId);
+  }
 }

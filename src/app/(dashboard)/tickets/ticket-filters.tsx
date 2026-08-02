@@ -90,7 +90,7 @@ export function TicketFilters({
           <Input
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
-            placeholder="Search titles..."
+            placeholder="Search title, system, module, tester, dev..."
             className="pl-8"
           />
         </div>

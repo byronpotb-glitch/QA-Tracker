@@ -1,7 +1,9 @@
 "use client";
 
 import { useTransition } from "react";
+import Link from "next/link";
 import { toast } from "sonner";
+import { PencilIcon } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -17,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import { updateUserRole } from "./actions";
 import type { Profile } from "@/db/schema";
 
@@ -37,6 +40,7 @@ export function UsersTable({
             <TableHead>Email</TableHead>
             <TableHead>Role</TableHead>
             <TableHead>Created</TableHead>
+            <TableHead className="w-16">Edit</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -80,6 +84,19 @@ function UserRow({ user, isSelf }: { user: Profile; isSelf: boolean }) {
       </TableCell>
       <TableCell className="text-muted-foreground">
         {dateFormatter.format(user.createdAt)}
+      </TableCell>
+      <TableCell>
+        {isSelf && (
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            aria-label="Edit your profile"
+            nativeButton={false}
+            render={<Link href="/profile" />}
+          >
+            <PencilIcon />
+          </Button>
+        )}
       </TableCell>
     </TableRow>
   );
