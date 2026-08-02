@@ -2,7 +2,7 @@ import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoginForm } from "./login-form";
 import { LoginStatusStrip } from "./login-status-strip";
-import { plexSans, spaceGrotesk } from "./fonts";
+import { plexSans, plexMono } from "./fonts";
 
 export default function LoginPage() {
   return (
@@ -38,7 +38,7 @@ export default function LoginPage() {
 
           <CardHeader className="px-4 pt-4">
             <CardTitle
-              className={`${spaceGrotesk.className} text-center text-lg leading-tight font-semibold tracking-tight text-[#101828]`}
+              className={`${plexMono.className} text-center text-lg leading-tight font-semibold tracking-tight text-[#101828]`}
             >
               Quality Assurance Tester Tracker
             </CardTitle>
