@@ -17,7 +17,7 @@ export function LoginStatusStrip() {
   }, []);
 
   return (
-    <div className="flex items-center justify-between rounded-t-xl border-b border-[#E4E7EC] bg-[#F7F8FA] px-4 py-2.5">
+    <div className="flex items-center justify-between rounded-t-xl border-b border-[#E4E7EC] bg-[#F7F8FA] px-4 py-2">
       <span
         className={`${plexMono.className} text-[10px] font-medium tracking-widest text-[#475467] uppercase`}
       >

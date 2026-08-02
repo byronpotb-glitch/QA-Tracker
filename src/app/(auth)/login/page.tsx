@@ -30,20 +30,20 @@ export default function LoginPage() {
           width={1254}
           height={1254}
           priority
-          className="size-12"
+          className="size-9"
         />
 
         <Card className="w-full gap-0 overflow-hidden rounded-xl border border-[#E4E7EC] p-0 py-0 shadow-[0_1px_2px_rgba(16,24,40,0.04),0_8px_24px_-8px_rgba(16,24,40,0.10)] ring-0">
           <LoginStatusStrip />
 
-          <CardHeader className="px-5 pt-5">
+          <CardHeader className="px-4 pt-4">
             <CardTitle
-              className={`${spaceGrotesk.className} text-center text-[21px] leading-tight font-semibold tracking-tight text-[#101828]`}
+              className={`${spaceGrotesk.className} text-center text-lg leading-tight font-semibold tracking-tight text-[#101828]`}
             >
               Quality Assurance Tester Tracker
             </CardTitle>
           </CardHeader>
-          <CardContent className="px-5 pb-5">
+          <CardContent className="px-4 pb-4">
             <LoginForm />
           </CardContent>
         </Card>
