@@ -82,3 +82,71 @@ export function sortByLowPerformance(devs: DevPerformance[]): DevPerformance[] {
     (a, b) => b.failed + b.recurring - (a.failed + a.recurring)
   );
 }
+
+export interface WeeklyTrendPoint {
+  weekStart: string;
+  total: number;
+  passed: number;
+  failed: number;
+  passRate: number;
+  recurring: number;
+}
+
+function startOfWeek(date: Date): Date {
+  const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const day = d.getDay();
+  const diffToMonday = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diffToMonday);
+  return d;
+}
+
+function toDateOnly(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+/**
+ * Buckets tickets by the Monday-start week they were created in, for the
+ * last `weeks` calendar weeks ending at `now` — including weeks with zero
+ * tickets, so a quiet week shows as zero rather than a gap in the series.
+ */
+export function computeWeeklyTrend(
+  rows: { createdAt: Date; ticketStatus: TicketStatus; failedCounter: number }[],
+  now: Date,
+  weeks = 12
+): WeeklyTrendPoint[] {
+  const buckets = new Map<
+    string,
+    { total: number; passed: number; failed: number; recurring: number }
+  >();
+
+  for (const row of rows) {
+    const key = toDateOnly(startOfWeek(row.createdAt));
+    const bucket = buckets.get(key) ?? { total: 0, passed: 0, failed: 0, recurring: 0 };
+    bucket.total += 1;
+    if (row.ticketStatus === "PASSED") bucket.passed += 1;
+    if (row.ticketStatus === "FAILED") bucket.failed += 1;
+    if (row.failedCounter > 0) bucket.recurring += 1;
+    buckets.set(key, bucket);
+  }
+
+  const currentWeekStart = startOfWeek(now);
+  const points: WeeklyTrendPoint[] = [];
+  for (let i = weeks - 1; i >= 0; i--) {
+    const weekStart = new Date(currentWeekStart);
+    weekStart.setDate(weekStart.getDate() - i * 7);
+    const key = toDateOnly(weekStart);
+    const bucket = buckets.get(key) ?? { total: 0, passed: 0, failed: 0, recurring: 0 };
+    points.push({
+      weekStart: key,
+      total: bucket.total,
+      passed: bucket.passed,
+      failed: bucket.failed,
+      passRate: bucket.total > 0 ? Math.round((bucket.passed / bucket.total) * 100) : 0,
+      recurring: bucket.recurring,
+    });
+  }
+  return points;
+}

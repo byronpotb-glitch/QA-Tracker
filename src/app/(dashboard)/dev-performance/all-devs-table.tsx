@@ -2,7 +2,14 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowUpIcon, ArrowDownIcon, ChevronLeftIcon, ChevronRightIcon, SearchIcon } from "lucide-react";
+import {
+  ArrowUpIcon,
+  ArrowDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  SearchIcon,
+  DownloadIcon,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,6 +29,7 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { passRate, type DevPerformance } from "@/lib/dev-performance";
+import { toCsv, downloadCsv } from "@/lib/csv";
 
 type SortKey = "dev" | "total" | "passed" | "failed" | "recurring" | "passRate";
 
@@ -80,6 +88,18 @@ export function AllDevsTable({ devs }: { devs: DevPerformance[] }) {
     setPage(1);
   }
 
+  function handleExport() {
+    const csv = toCsv(sorted, [
+      { key: "dev", label: "Dev", value: (d) => d.dev },
+      { key: "total", label: "Total", value: (d) => d.total },
+      { key: "passed", label: "Passed", value: (d) => d.passed },
+      { key: "failed", label: "Failed", value: (d) => d.failed },
+      { key: "recurring", label: "Recurring", value: (d) => d.recurring },
+      { key: "passRate", label: "Pass Rate %", value: (d) => d.passRate },
+    ]);
+    downloadCsv(`dev-performance-${new Date().toISOString().slice(0, 10)}.csv`, csv);
+  }
+
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -95,28 +115,34 @@ export function AllDevsTable({ devs }: { devs: DevPerformance[] }) {
             className="pl-8"
           />
         </div>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span>Show</span>
-          <Select
-            value={String(pageSize)}
-            onValueChange={(v) => {
-              if (!v) return;
-              setPageSize(Number(v));
-              setPage(1);
-            }}
-          >
-            <SelectTrigger className="w-16">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {PAGE_SIZES.map((size) => (
-                <SelectItem key={size} value={String(size)}>
-                  {size}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <span>per page</span>
+        <div className="flex items-center gap-3">
+          <Button variant="outline" size="sm" onClick={handleExport}>
+            <DownloadIcon />
+            Export CSV
+          </Button>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <span>Show</span>
+            <Select
+              value={String(pageSize)}
+              onValueChange={(v) => {
+                if (!v) return;
+                setPageSize(Number(v));
+                setPage(1);
+              }}
+            >
+              <SelectTrigger className="w-16">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {PAGE_SIZES.map((size) => (
+                  <SelectItem key={size} value={String(size)}>
+                    {size}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <span>per page</span>
+          </div>
         </div>
       </div>
 

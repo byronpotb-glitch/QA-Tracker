@@ -2,7 +2,7 @@
 
 import { useTransition } from "react";
 import { toast } from "sonner";
-import { PencilIcon, Trash2Icon } from "lucide-react";
+import { CopyIcon, PencilIcon, Trash2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
 import {
@@ -103,6 +103,15 @@ export function TestCaseRow({
               trigger={
                 <Button variant="ghost" size="icon-sm" aria-label="Edit test case">
                   <PencilIcon />
+                </Button>
+              }
+            />
+            <TestCaseDialog
+              ticketId={ticketId}
+              duplicateFrom={testCase}
+              trigger={
+                <Button variant="ghost" size="icon-sm" aria-label="Duplicate test case">
+                  <CopyIcon />
                 </Button>
               }
             />

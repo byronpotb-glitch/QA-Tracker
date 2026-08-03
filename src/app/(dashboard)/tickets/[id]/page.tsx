@@ -163,7 +163,7 @@ export default async function TicketDetailPage({
                 <TableHead>Priority</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Tested</TableHead>
-                <TableHead className="w-20">Actions</TableHead>
+                <TableHead className="w-28">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

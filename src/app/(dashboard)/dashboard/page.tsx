@@ -30,6 +30,7 @@ import {
 import { DevMiniList } from "../dev-mini-list";
 import { DashboardDateFilter, type DateField } from "./date-filter";
 import { DashboardCompanyFilter } from "./company-filter";
+import { ExportRecurringButton } from "./export-recurring-button";
 import type { Company, TicketStatus, TestCaseStatus } from "@/lib/validations";
 
 const COMPANIES: readonly Company[] = ["POTB", "GLADEX"];
@@ -268,15 +269,20 @@ export default async function DashboardPage({
               round of testing — sorted by how many times they&apos;ve failed.
             </p>
           </div>
-          {recurringFailures.length > RECURRING_PREVIEW_LIMIT && (
-            <Link
-              href={`/tickets?recurring=1${company ? `&${companyQueryParam}` : ""}`}
-              className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
-            >
-              View all ({recurringFailures.length})
-              <ArrowRightIcon className="size-3.5" />
-            </Link>
-          )}
+          <div className="flex items-center gap-3">
+            {recurringFailures.length > 0 && (
+              <ExportRecurringButton rows={recurringFailures} />
+            )}
+            {recurringFailures.length > RECURRING_PREVIEW_LIMIT && (
+              <Link
+                href={`/tickets?recurring=1${company ? `&${companyQueryParam}` : ""}`}
+                className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+              >
+                View all ({recurringFailures.length})
+                <ArrowRightIcon className="size-3.5" />
+              </Link>
+            )}
+          </div>
         </div>
         <div className="rounded-xl ring-1 ring-foreground/10">
           <Table>

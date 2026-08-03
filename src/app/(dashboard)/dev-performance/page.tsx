@@ -2,15 +2,17 @@ import { and, gte, lte } from "drizzle-orm";
 import { TrendingUpIcon, TrendingDownIcon } from "lucide-react";
 import { db } from "@/db";
 import { tickets } from "@/db/schema";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   computeDevPerformance,
+  computeWeeklyTrend,
   sortByHighPerformance,
   sortByLowPerformance,
 } from "@/lib/dev-performance";
 import { DevMiniList } from "../dev-mini-list";
 import { DashboardDateFilter, type DateField } from "../dashboard/date-filter";
 import { AllDevsTable } from "./all-devs-table";
+import { LazyTrendChart } from "./lazy-trend-chart";
 
 export const dynamic = "force-dynamic";
 
@@ -31,16 +33,29 @@ export default async function DevPerformancePage({
         }
       : null;
 
-  const rows = await db
-    .select({
-      dev: tickets.dev,
-      ticketStatus: tickets.ticketStatus,
-      failedCounter: tickets.failedCounter,
-    })
-    .from(tickets)
-    .where(
-      dateRange ? and(gte(dateColumn, dateRange.from), lte(dateColumn, dateRange.to)) : undefined
-    );
+  const [rows, trendRows] = await Promise.all([
+    db
+      .select({
+        dev: tickets.dev,
+        ticketStatus: tickets.ticketStatus,
+        failedCounter: tickets.failedCounter,
+      })
+      .from(tickets)
+      .where(
+        dateRange
+          ? and(gte(dateColumn, dateRange.from), lte(dateColumn, dateRange.to))
+          : undefined
+      ),
+    // Trend always spans a fixed recent window, independent of the filter
+    // above — a "last month" filter would otherwise flatten most of it to zero.
+    db
+      .select({
+        createdAt: tickets.createdAt,
+        ticketStatus: tickets.ticketStatus,
+        failedCounter: tickets.failedCounter,
+      })
+      .from(tickets),
+  ]);
 
   const performance = computeDevPerformance(rows);
   const topPerformers = sortByHighPerformance(
@@ -48,6 +63,7 @@ export default async function DevPerformancePage({
   ).slice(0, 2);
   const needsAttention = sortByLowPerformance(performance).slice(0, 2);
   const allDevs = [...performance].sort((a, b) => b.total - a.total);
+  const trend = computeWeeklyTrend(trendRows, new Date(), 12);
 
   return (
     <div className="flex flex-col gap-6">
@@ -61,6 +77,17 @@ export default async function DevPerformancePage({
         </div>
         <DashboardDateFilter from={params.from} to={params.to} field={dateField} />
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm font-medium">
+            Trend — last 12 weeks
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <LazyTrendChart data={trend} />
+        </CardContent>
+      </Card>
 
       {performance.length === 0 ? (
         <Card>

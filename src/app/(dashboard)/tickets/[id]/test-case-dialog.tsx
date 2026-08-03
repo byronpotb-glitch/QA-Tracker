@@ -37,16 +37,21 @@ const STATUSES = [
 export function TestCaseDialog({
   ticketId,
   testCase,
+  duplicateFrom,
   trigger,
 }: {
   ticketId: string;
   testCase?: TestCase;
+  /** Prefills the Add form from an existing test case, resetting result/status fields to fresh. */
+  duplicateFrom?: TestCase;
   trigger: ReactElement;
 }) {
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const isEdit = Boolean(testCase);
+  const isDuplicate = !isEdit && Boolean(duplicateFrom);
+  const defaults = testCase ?? duplicateFrom;
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -78,7 +83,9 @@ export function TestCaseDialog({
       <DialogTrigger render={trigger} />
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>{isEdit ? "Edit Test Case" : "Add Test Case"}</DialogTitle>
+          <DialogTitle>
+            {isEdit ? "Edit Test Case" : isDuplicate ? "Duplicate Test Case" : "Add Test Case"}
+          </DialogTitle>
         </DialogHeader>
         <form
           onSubmit={handleSubmit}
@@ -90,13 +97,13 @@ export function TestCaseDialog({
               <Input
                 id="tc_number"
                 name="tc_number"
-                defaultValue={testCase?.tcNumber}
+                defaultValue={defaults?.tcNumber}
                 required
               />
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="page">Page</Label>
-              <Input id="page" name="page" defaultValue={testCase?.page} required />
+              <Input id="page" name="page" defaultValue={defaults?.page} required />
             </div>
           </div>
 
@@ -105,7 +112,7 @@ export function TestCaseDialog({
             <Textarea
               id="description"
               name="description"
-              defaultValue={testCase?.description}
+              defaultValue={defaults?.description}
               required
             />
           </div>
@@ -113,7 +120,7 @@ export function TestCaseDialog({
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-2">
               <Label htmlFor="priority">Priority</Label>
-              <Select name="priority" defaultValue={testCase?.priority ?? "MEDIUM"}>
+              <Select name="priority" defaultValue={defaults?.priority ?? "MEDIUM"}>
                 <SelectTrigger id="priority" className="w-full">
                   <SelectValue />
                 </SelectTrigger>
@@ -128,7 +135,7 @@ export function TestCaseDialog({
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="status">Status</Label>
-              <Select name="status" defaultValue={testCase?.status ?? "NOT_TESTED"}>
+              <Select name="status" defaultValue={isDuplicate ? "NOT_TESTED" : defaults?.status ?? "NOT_TESTED"}>
                 <SelectTrigger id="status" className="w-full">
                   <SelectValue />
                 </SelectTrigger>
@@ -148,7 +155,7 @@ export function TestCaseDialog({
             <Textarea
               id="expected_result"
               name="expected_result"
-              defaultValue={testCase?.expectedResult}
+              defaultValue={defaults?.expectedResult}
               required
             />
           </div>
@@ -158,7 +165,7 @@ export function TestCaseDialog({
             <Textarea
               id="actual_result"
               name="actual_result"
-              defaultValue={testCase?.actualResult ?? ""}
+              defaultValue={isDuplicate ? "" : defaults?.actualResult ?? ""}
             />
           </div>
 
@@ -167,7 +174,7 @@ export function TestCaseDialog({
             <Textarea
               id="comments"
               name="comments"
-              defaultValue={testCase?.comments ?? ""}
+              defaultValue={isDuplicate ? "" : defaults?.comments ?? ""}
             />
           </div>
 
@@ -177,7 +184,7 @@ export function TestCaseDialog({
               id="tested_date"
               name="tested_date"
               type="date"
-              defaultValue={testCase?.testedDate ?? ""}
+              defaultValue={isDuplicate ? "" : defaults?.testedDate ?? ""}
             />
           </div>
 
