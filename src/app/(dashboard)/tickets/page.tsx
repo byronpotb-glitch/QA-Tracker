@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { desc, isNotNull, sql } from "drizzle-orm";
+import { asc, desc, isNotNull, sql, type SQL } from "drizzle-orm";
 import { db } from "@/db";
 import { tickets } from "@/db/schema";
 import { Button } from "@/components/ui/button";
@@ -7,10 +7,10 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { SortableTableHead } from "@/components/sortable-table-head";
 import { StatusBadge } from "@/lib/status";
 import { TicketFilters } from "./ticket-filters";
 import { CreatedDateCell } from "./created-date-cell";
@@ -19,9 +19,29 @@ import { getCurrentUser } from "@/lib/auth/roles";
 import { getProjects } from "@/lib/projects";
 import { dedupeDevNames } from "@/lib/dev-performance";
 import { buildTicketWhereClause } from "@/lib/build-ticket-filters";
+import { buildSortHref, type SortDir } from "@/lib/sort-link";
 import { PaginationControls } from "@/components/pagination-controls";
 import { PageSizeSelect } from "@/components/page-size-select";
 import { PAGE_SIZE_OPTIONS, DEFAULT_PAGE_SIZE } from "@/lib/page-size";
+
+const SORT_COLUMNS = {
+  title: { column: tickets.title, defaultDir: "asc" as SortDir },
+  company: { column: tickets.company, defaultDir: "asc" as SortDir },
+  system: { column: tickets.system, defaultDir: "asc" as SortDir },
+  issue_type: { column: tickets.issueType, defaultDir: "asc" as SortDir },
+  status: { column: tickets.ticketStatus, defaultDir: "asc" as SortDir },
+  tester: { column: tickets.tester, defaultDir: "asc" as SortDir },
+  dev: { column: tickets.dev, defaultDir: "asc" as SortDir },
+  recurring: { column: tickets.failedCounter, defaultDir: "desc" as SortDir },
+  created: { column: tickets.createdAt, defaultDir: "desc" as SortDir },
+  updated: { column: tickets.updatedAt, defaultDir: "desc" as SortDir },
+} as const;
+
+type SortKey = keyof typeof SORT_COLUMNS;
+
+function isSortKey(value: string | undefined): value is SortKey {
+  return Boolean(value) && value! in SORT_COLUMNS;
+}
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   dateStyle: "medium",
@@ -41,6 +61,8 @@ export default async function TicketsPage({
     recurring?: string;
     page?: string;
     pageSize?: string;
+    sort?: string;
+    dir?: string;
   }>;
 }) {
   const params = await searchParams;
@@ -50,6 +72,9 @@ export default async function TicketsPage({
   const pageSize = (PAGE_SIZE_OPTIONS as readonly number[]).includes(requestedPageSize)
     ? requestedPageSize
     : DEFAULT_PAGE_SIZE;
+  const sortKey: SortKey = isSortKey(params.sort) ? params.sort : "updated";
+  const sortDir: SortDir = params.dir === "asc" ? "asc" : params.dir === "desc" ? "desc" : SORT_COLUMNS[sortKey].defaultDir;
+  const orderBy: SQL = sortDir === "asc" ? asc(SORT_COLUMNS[sortKey].column) : desc(SORT_COLUMNS[sortKey].column);
 
   const [projects, devRows] = await Promise.all([
     getProjects(),
@@ -68,7 +93,7 @@ export default async function TicketsPage({
       .select()
       .from(tickets)
       .where(whereClause)
-      .orderBy(desc(tickets.updatedAt))
+      .orderBy(orderBy)
       .limit(pageSize)
       .offset((page - 1) * pageSize),
     db.select({ count: sql<number>`count(*)::int` }).from(tickets).where(whereClause),
@@ -133,16 +158,28 @@ export default async function TicketsPage({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Title</TableHead>
-              <TableHead>Company</TableHead>
-              <TableHead>System / Module</TableHead>
-              <TableHead>Issue Type</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Tester</TableHead>
-              <TableHead>Dev</TableHead>
-              <TableHead>Recurring</TableHead>
-              <TableHead>Created</TableHead>
-              <TableHead>Updated</TableHead>
+              {(
+                [
+                  ["title", "Title"],
+                  ["company", "Company"],
+                  ["system", "System / Module"],
+                  ["issue_type", "Issue Type"],
+                  ["status", "Status"],
+                  ["tester", "Tester"],
+                  ["dev", "Dev"],
+                  ["recurring", "Recurring"],
+                  ["created", "Created"],
+                  ["updated", "Updated"],
+                ] as const
+              ).map(([key, label]) => (
+                <SortableTableHead
+                  key={key}
+                  label={label}
+                  href={buildSortHref("/tickets", params, key, SORT_COLUMNS[key].defaultDir)}
+                  active={sortKey === key}
+                  dir={sortDir}
+                />
+              ))}
             </TableRow>
           </TableHeader>
           <TableBody>
