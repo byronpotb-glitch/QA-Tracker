@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { and, desc, eq, gt, ilike, isNotNull, or, sql } from "drizzle-orm";
+import { desc, isNotNull, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { tickets } from "@/db/schema";
 import { Button } from "@/components/ui/button";
@@ -14,28 +14,14 @@ import {
 import { StatusBadge } from "@/lib/status";
 import { TicketFilters } from "./ticket-filters";
 import { CreatedDateCell } from "./created-date-cell";
+import { ExportTicketsButton } from "./export-tickets-button";
 import { getCurrentUser } from "@/lib/auth/roles";
 import { getProjects } from "@/lib/projects";
 import { dedupeDevNames } from "@/lib/dev-performance";
+import { buildTicketWhereClause } from "@/lib/build-ticket-filters";
 import { PaginationControls } from "@/components/pagination-controls";
 import { PageSizeSelect } from "@/components/page-size-select";
 import { PAGE_SIZE_OPTIONS, DEFAULT_PAGE_SIZE } from "@/lib/page-size";
-import type { Company, IssueType, TicketStatus } from "@/lib/validations";
-
-const COMPANIES: readonly Company[] = ["POTB", "GLADEX"];
-const STATUSES: readonly TicketStatus[] = [
-  "PASSED",
-  "FAILED",
-  "IN_PROGRESS",
-  "PENDING",
-  "ON_HOLD",
-];
-const ISSUE_TYPES: readonly IssueType[] = [
-  "BUG",
-  "FEATURE",
-  "IMPROVEMENT",
-  "CHANGE_REQUEST",
-];
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   dateStyle: "medium",
@@ -75,39 +61,7 @@ export default async function TicketsPage({
   const systems = projects.map((p) => p.name);
   const devs = dedupeDevNames(devRows.map((r) => r.dev).filter((d): d is string => d !== null));
 
-  const filters = [];
-  if (params.q && params.q.trim()) {
-    const q = `%${params.q.trim()}%`;
-    filters.push(
-      or(
-        ilike(tickets.title, q),
-        ilike(tickets.system, q),
-        ilike(tickets.module, q),
-        ilike(tickets.tester, q),
-        ilike(tickets.dev, q)
-      )
-    );
-  }
-  if (params.company && COMPANIES.includes(params.company as Company)) {
-    filters.push(eq(tickets.company, params.company as Company));
-  }
-  if (params.status && STATUSES.includes(params.status as TicketStatus)) {
-    filters.push(eq(tickets.ticketStatus, params.status as TicketStatus));
-  }
-  if (params.system && systems.includes(params.system)) {
-    filters.push(eq(tickets.system, params.system));
-  }
-  if (params.issue_type && ISSUE_TYPES.includes(params.issue_type as IssueType)) {
-    filters.push(eq(tickets.issueType, params.issue_type as IssueType));
-  }
-  if (params.dev) {
-    filters.push(ilike(tickets.dev, params.dev));
-  }
-  if (params.recurring === "1") {
-    filters.push(gt(tickets.failedCounter, 0));
-  }
-
-  const whereClause = filters.length ? and(...filters) : undefined;
+  const whereClause = buildTicketWhereClause(params, systems);
 
   const [rows, [{ count: totalCount }]] = await Promise.all([
     db
@@ -160,7 +114,18 @@ export default async function TicketsPage({
         </div>
       )}
 
-      <div className="flex items-center justify-end">
+      <div className="flex items-center justify-between">
+        <ExportTicketsButton
+          params={{
+            q: params.q,
+            company: params.company,
+            status: params.status,
+            system: params.system,
+            issue_type: params.issue_type,
+            dev: params.dev,
+            recurring: params.recurring,
+          }}
+        />
         <PageSizeSelect pageSize={pageSize} />
       </div>
 
