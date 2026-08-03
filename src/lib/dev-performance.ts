@@ -69,8 +69,19 @@ export function dedupeDevNames(names: string[]): string[] {
   return Array.from(seen.values()).sort();
 }
 
+/**
+ * Recurring failures count against the rate even though the ticket is
+ * currently PASSED — a ticket that needed 3 rounds to pass shouldn't score
+ * the same as one that passed first try. Each recurring failure is treated
+ * as an extra attempt in the denominator, so more rework pulls the rate down.
+ */
+export function computePassRate(passed: number, total: number, recurring: number): number {
+  const denominator = total + recurring;
+  return denominator > 0 ? Math.round((passed / denominator) * 100) : 0;
+}
+
 export function passRate(dev: DevPerformance): number {
-  return dev.total > 0 ? Math.round((dev.passed / dev.total) * 100) : 0;
+  return computePassRate(dev.passed, dev.total, dev.recurring);
 }
 
 export function sortByHighPerformance(devs: DevPerformance[]): DevPerformance[] {
@@ -144,7 +155,7 @@ export function computeWeeklyTrend(
       total: bucket.total,
       passed: bucket.passed,
       failed: bucket.failed,
-      passRate: bucket.total > 0 ? Math.round((bucket.passed / bucket.total) * 100) : 0,
+      passRate: computePassRate(bucket.passed, bucket.total, bucket.recurring),
       recurring: bucket.recurring,
     });
   }
