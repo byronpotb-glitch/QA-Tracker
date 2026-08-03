@@ -37,25 +37,25 @@ export async function exportTicketsCsv(
     }
   }
 
+  // Column set/order matches the Excel import template (Test ID, Title,
+  // Test Case ID, ... Lakbay Tester's) so exports and imports stay symmetric.
   const csv = toCsv(rows, [
-    { key: "title", label: "Ticket Title", value: (r) => r.ticket.title },
-    { key: "company", label: "Company", value: (r) => r.ticket.company },
+    { key: "test_id", label: "Test ID", value: () => "" },
+    { key: "title", label: "Title", value: (r) => r.ticket.title },
+    { key: "tc_number", label: "Test Case ID", value: (r) => r.tc?.tcNumber ?? "" },
     { key: "system", label: "System", value: (r) => r.ticket.system },
     { key: "module", label: "Module", value: (r) => r.ticket.module },
-    { key: "issue_type", label: "Issue Type", value: (r) => r.ticket.issueType },
-    { key: "ticket_status", label: "Ticket Status", value: (r) => r.ticket.ticketStatus },
-    { key: "tester", label: "Tester", value: (r) => r.ticket.tester },
-    { key: "dev", label: "Dev", value: (r) => r.ticket.dev ?? "" },
-    { key: "times_failed", label: "Times Failed", value: (r) => r.ticket.failedCounter },
-    { key: "tc_number", label: "TC Number", value: (r) => r.tc?.tcNumber ?? "" },
     { key: "page", label: "Page", value: (r) => r.tc?.page ?? "" },
     { key: "description", label: "Description", value: (r) => r.tc?.description ?? "" },
     { key: "priority", label: "Priority", value: (r) => r.tc?.priority ?? "" },
+    { key: "issue_type", label: "Issue Type", value: (r) => r.ticket.issueType },
     { key: "expected_result", label: "Expected Result", value: (r) => r.tc?.expectedResult ?? "" },
     { key: "actual_result", label: "Actual Result", value: (r) => r.tc?.actualResult ?? "" },
-    { key: "tc_status", label: "TC Status", value: (r) => r.tc?.status ?? "" },
-    { key: "tested_date", label: "Tested Date", value: (r) => r.tc?.testedDate ?? "" },
     { key: "comments", label: "Comments", value: (r) => r.tc?.comments ?? "" },
+    { key: "status", label: "Status", value: (r) => r.tc?.status ?? "" },
+    { key: "ticket_status", label: "Ticket Status", value: (r) => r.ticket.ticketStatus },
+    { key: "date", label: "Date", value: (r) => r.tc?.testedDate ?? "" },
+    { key: "tester", label: "Lakbay Tester's", value: (r) => r.ticket.tester },
   ]);
 
   return { csv };
