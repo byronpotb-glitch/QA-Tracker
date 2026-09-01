@@ -1,4 +1,4 @@
-import { and, eq, gt, ilike, or, type SQL } from "drizzle-orm";
+import { and, eq, gt, gte, ilike, lte, or, type SQL } from "drizzle-orm";
 import { tickets } from "@/db/schema";
 import type { Company, IssueType, TicketStatus } from "@/lib/validations";
 
@@ -25,6 +25,9 @@ export interface TicketFilterParams {
   issue_type?: string;
   dev?: string;
   recurring?: string;
+  from?: string;
+  to?: string;
+  field?: string;
 }
 
 /**
@@ -66,6 +69,13 @@ export function buildTicketWhereClause(
   }
   if (params.recurring === "1") {
     filters.push(gt(tickets.failedCounter, 0));
+  }
+  if (params.from && params.to) {
+    const dateColumn = params.field === "updated" ? tickets.updatedAt : tickets.createdAt;
+    filters.push(
+      gte(dateColumn, new Date(`${params.from}T00:00:00`)),
+      lte(dateColumn, new Date(`${params.to}T23:59:59.999`))
+    );
   }
 
   return filters.length ? and(...filters) : undefined;

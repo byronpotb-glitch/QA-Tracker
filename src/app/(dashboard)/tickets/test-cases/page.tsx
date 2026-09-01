@@ -1,24 +1,17 @@
 import Link from "next/link";
-import { and, desc, eq, ilike, inArray, isNotNull, or, sql } from "drizzle-orm";
+import { and, desc, eq, gte, ilike, inArray, isNotNull, lte, or, sql } from "drizzle-orm";
 import { ArrowLeftIcon } from "lucide-react";
 import { db } from "@/db";
 import { testCases, tickets } from "@/db/schema";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { PriorityBadge, StatusBadge } from "@/lib/status";
+import { Card, CardContent } from "@/components/ui/card";
+import { TicketTestCasesCard } from "./ticket-test-cases-card";
 import { TicketFilters } from "../ticket-filters";
 import { PaginationControls } from "@/components/pagination-controls";
 import { PageSizeSelect } from "@/components/page-size-select";
 import { PAGE_SIZE_OPTIONS, DEFAULT_PAGE_SIZE } from "@/lib/page-size";
 import { getProjects } from "@/lib/projects";
 import { dedupeDevNames } from "@/lib/dev-performance";
+import { DashboardDateFilter, type DateField } from "../../dashboard/date-filter";
 import type { Company, IssueType, TestCaseStatus, TicketStatus } from "@/lib/validations";
 
 export const dynamic = "force-dynamic";
@@ -59,9 +52,13 @@ export default async function AllTestCasesPage({
     tc_status?: string;
     page?: string;
     pageSize?: string;
+    from?: string;
+    to?: string;
+    field?: string;
   }>;
 }) {
   const params = await searchParams;
+  const dateField: DateField = params.field === "updated" ? "updated" : "created";
   const page = Math.max(1, Number(params.page) || 1);
   const requestedPageSize = Number(params.pageSize);
   const pageSize = (PAGE_SIZE_OPTIONS as readonly number[]).includes(requestedPageSize)
@@ -113,6 +110,13 @@ export default async function AllTestCasesPage({
   }
   if (params.dev) {
     filters.push(ilike(tickets.dev, params.dev));
+  }
+  if (params.from && params.to) {
+    const dateColumn = dateField === "updated" ? tickets.updatedAt : tickets.createdAt;
+    filters.push(
+      gte(dateColumn, new Date(`${params.from}T00:00:00`)),
+      lte(dateColumn, new Date(`${params.to}T23:59:59.999`))
+    );
   }
 
   const whereClause = filters.length ? and(...filters) : undefined;
@@ -166,16 +170,19 @@ export default async function AllTestCasesPage({
         </p>
       </div>
 
-      <TicketFilters
-        q={params.q}
-        company={params.company}
-        status={params.status}
-        system={params.system}
-        issueType={params.issue_type}
-        dev={params.dev}
-        systems={systems}
-        devs={devs}
-      />
+      <div className="flex flex-wrap items-end gap-2">
+        <TicketFilters
+          q={params.q}
+          company={params.company}
+          status={params.status}
+          system={params.system}
+          issueType={params.issue_type}
+          dev={params.dev}
+          systems={systems}
+          devs={devs}
+        />
+        <DashboardDateFilter from={params.from} to={params.to} field={dateField} />
+      </div>
 
       {tcStatus && (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -204,71 +211,7 @@ export default async function AllTestCasesPage({
       ) : (
         <div className="flex flex-col gap-4">
           {ticketsWithTestCases.map((ticket) => (
-            <Card key={ticket.id}>
-              <CardHeader>
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <CardTitle className="text-sm font-medium">
-                    <Link
-                      href={`/tickets/${ticket.id}`}
-                      className="hover:underline"
-                    >
-                      {ticket.title}
-                    </Link>
-                  </CardTitle>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <span>{ticket.company}</span>
-                    <StatusBadge status={ticket.ticketStatus} />
-                    <span>
-                      {ticket.testCases.length} test case
-                      {ticket.testCases.length === 1 ? "" : "s"}
-                    </span>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="rounded-xl ring-1 ring-foreground/10">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>TC#</TableHead>
-                        <TableHead>Page</TableHead>
-                        <TableHead>Description</TableHead>
-                        <TableHead>Priority</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Tested</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {ticket.testCases.map((tc) => (
-                        <TableRow key={tc.id}>
-                          <TableCell className="font-medium">
-                            {tc.tcNumber}
-                          </TableCell>
-                          <TableCell className="text-muted-foreground">
-                            {tc.page}
-                          </TableCell>
-                          <TableCell
-                            className="max-w-80 truncate"
-                            title={tc.description}
-                          >
-                            {tc.description}
-                          </TableCell>
-                          <TableCell>
-                            <PriorityBadge priority={tc.priority} />
-                          </TableCell>
-                          <TableCell>
-                            <StatusBadge status={tc.status} />
-                          </TableCell>
-                          <TableCell className="text-muted-foreground">
-                            {tc.testedDate ?? "—"}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </CardContent>
-            </Card>
+            <TicketTestCasesCard key={ticket.id} ticket={ticket} />
           ))}
         </div>
       )}

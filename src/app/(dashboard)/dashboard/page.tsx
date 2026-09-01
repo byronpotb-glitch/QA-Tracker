@@ -31,6 +31,7 @@ import { DevMiniList } from "../dev-mini-list";
 import { DashboardDateFilter, type DateField } from "./date-filter";
 import { DashboardCompanyFilter } from "./company-filter";
 import { ExportRecurringButton } from "./export-recurring-button";
+import { StatTile } from "@/components/stat-tile";
 import type { Company, TicketStatus, TestCaseStatus } from "@/lib/validations";
 
 const COMPANIES: readonly Company[] = ["POTB", "GLADEX"];
@@ -66,7 +67,26 @@ export default async function DashboardPage({
 
   const company: Company | undefined =
     params.company === "POTB" || params.company === "GLADEX" ? params.company : undefined;
-  const companyQueryParam = company ? `company=${company}` : "";
+
+  // Shared by every drill-through link below, so clicking a stat/chart/row
+  // carries the same company + date filter that's currently applied here —
+  // otherwise "Failed: 1" (this week) links to a page showing every failed
+  // ticket ever, not just the one behind that number.
+  const filterQuery = new URLSearchParams();
+  if (company) filterQuery.set("company", company);
+  if (params.from && params.to) {
+    filterQuery.set("from", params.from);
+    filterQuery.set("to", params.to);
+    filterQuery.set("field", dateField);
+  }
+  function buildHref(base: string, extra?: Record<string, string>): string {
+    const qs = new URLSearchParams(filterQuery);
+    if (extra) for (const [key, value] of Object.entries(extra)) qs.set(key, value);
+    const query = qs.toString();
+    return query ? `${base}?${query}` : base;
+  }
+  const ticketsStatusLinkBase = `/tickets?${filterQuery.toString() ? `${filterQuery.toString()}&` : ""}status=`;
+  const testCasesStatusLinkBase = `/tickets/test-cases?${filterQuery.toString() ? `${filterQuery.toString()}&` : ""}tc_status=`;
 
   const dateRange =
     params.from && params.to
@@ -165,13 +185,13 @@ export default async function DashboardPage({
           label="Total tickets"
           value={totalTickets}
           icon={TicketIcon}
-          href={company ? `/tickets?${companyQueryParam}` : "/tickets"}
+          href={buildHref("/tickets")}
         />
         <StatTile
           label="Total test cases"
           value={totalTestCases}
           icon={ClipboardListIcon}
-          href={company ? `/tickets/test-cases?${companyQueryParam}` : "/tickets/test-cases"}
+          href={buildHref("/tickets/test-cases")}
         />
         <StatTile
           label="Failed tickets"
@@ -179,7 +199,7 @@ export default async function DashboardPage({
           icon={XCircleIcon}
           tone="critical"
           percent={pct(failedCount)}
-          href={`/tickets?status=FAILED${company ? `&${companyQueryParam}` : ""}`}
+          href={buildHref("/tickets", { status: "FAILED" })}
         />
         <StatTile
           label="Recurring failures"
@@ -187,7 +207,7 @@ export default async function DashboardPage({
           icon={RefreshCcwIcon}
           tone="warning"
           percent={pct(recurringFailures.length)}
-          href={`/tickets?recurring=1${company ? `&${companyQueryParam}` : ""}`}
+          href={buildHref("/tickets", { recurring: "1" })}
         />
       </div>
 
@@ -197,10 +217,7 @@ export default async function DashboardPage({
             <CardTitle className="text-sm font-medium">Tickets by status</CardTitle>
           </CardHeader>
           <CardContent>
-            <StatusBarChart
-              data={ticketChartData}
-              linkBase={`/tickets?${company ? `${companyQueryParam}&` : ""}status=`}
-            />
+            <StatusBarChart data={ticketChartData} linkBase={ticketsStatusLinkBase} />
           </CardContent>
         </Card>
         <Card>
@@ -208,13 +225,14 @@ export default async function DashboardPage({
             <CardTitle className="text-sm font-medium">Test cases by status</CardTitle>
           </CardHeader>
           <CardContent>
-            <StatusBarChart
-              data={testCaseChartData}
-              linkBase={`/tickets/test-cases?${company ? `${companyQueryParam}&` : ""}tc_status=`}
-            />
+            <StatusBarChart data={testCaseChartData} linkBase={testCasesStatusLinkBase} />
           </CardContent>
         </Card>
-        <CompanyBreakdownCard companyCountMap={companyCountMap} total={totalTickets} />
+        <CompanyBreakdownCard
+          companyCountMap={companyCountMap}
+          total={totalTickets}
+          buildHref={buildHref}
+        />
       </div>
 
       <div className="flex flex-col gap-3">
@@ -275,7 +293,7 @@ export default async function DashboardPage({
             )}
             {recurringFailures.length > RECURRING_PREVIEW_LIMIT && (
               <Link
-                href={`/tickets?recurring=1${company ? `&${companyQueryParam}` : ""}`}
+                href={buildHref("/tickets", { recurring: "1" })}
                 className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
               >
                 View all ({recurringFailures.length})
@@ -335,9 +353,11 @@ export default async function DashboardPage({
 function CompanyBreakdownCard({
   companyCountMap,
   total,
+  buildHref,
 }: {
   companyCountMap: Map<Company, number>;
   total: number;
+  buildHref: (base: string, extra?: Record<string, string>) => string;
 }) {
   const pct = (n: number) => (total > 0 ? Math.round((n / total) * 100) : 0);
   const companyClass: Record<Company, string> = {
@@ -371,7 +391,7 @@ function CompanyBreakdownCard({
             return (
               <Link
                 key={company}
-                href={`/tickets?company=${company}`}
+                href={buildHref("/tickets", { company })}
                 className="-mx-2 flex items-center justify-between rounded-lg px-2 py-1.5 text-sm transition-colors hover:bg-muted"
               >
                 <span className="flex items-center gap-2 font-medium">
@@ -391,68 +411,3 @@ function CompanyBreakdownCard({
   );
 }
 
-function StatTile({
-  label,
-  value,
-  icon: Icon,
-  percent,
-  tone = "default",
-  href,
-}: {
-  label: string;
-  value: number;
-  icon: React.ComponentType<{ className?: string }>;
-  percent?: number;
-  tone?: "default" | "critical" | "warning";
-  href: string;
-}) {
-  const toneClasses = {
-    default: {
-      iconBg: "bg-muted text-foreground/70",
-      bar: "bg-foreground/70",
-    },
-    critical: {
-      iconBg: "bg-destructive/10 text-destructive",
-      bar: "bg-destructive",
-    },
-    warning: {
-      iconBg: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
-      bar: "bg-amber-500",
-    },
-  }[tone];
-
-  return (
-    <Link href={href} className="block h-full">
-      <Card className="h-full transition-shadow hover:shadow-md hover:ring-foreground/20">
-        <CardContent className="flex h-full flex-col justify-between gap-3">
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">{label}</span>
-              <div
-                className={`flex size-8 shrink-0 items-center justify-center rounded-lg ${toneClasses.iconBg}`}
-              >
-                <Icon className="size-4" />
-              </div>
-            </div>
-            <span className="font-mono text-2xl font-semibold tabular-nums">
-              {value.toLocaleString()}
-            </span>
-          </div>
-          {percent !== undefined && (
-            <div className="flex items-center gap-2">
-              <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
-                <div
-                  className={`h-full rounded-full ${toneClasses.bar}`}
-                  style={{ width: `${Math.min(100, percent)}%` }}
-                />
-              </div>
-              <span className="font-mono text-xs tabular-nums text-muted-foreground">
-                {percent}%
-              </span>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </Link>
-  );
-}

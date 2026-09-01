@@ -88,6 +88,19 @@ export function DashboardDateFilter({
     applyRange(start, end);
   }
 
+  /** Monday-to-Sunday, matching the weekly report cadence. */
+  function applyWeekPreset(weeksAgo: number) {
+    const now = new Date();
+    const day = now.getDay();
+    const diffToMonday = day === 0 ? -6 : 1 - day;
+    const start = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diffToMonday);
+    start.setDate(start.getDate() - weeksAgo * 7);
+    const end = new Date(start);
+    end.setDate(end.getDate() + 6);
+    setRange({ from: start, to: end });
+    applyRange(start, end);
+  }
+
   return (
     <Popover>
       <PopoverTrigger
@@ -122,6 +135,12 @@ export function DashboardDateFilter({
         </div>
 
         <div className="flex flex-wrap gap-1.5">
+          <Button variant="outline" size="sm" onClick={() => applyWeekPreset(0)}>
+            This week
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => applyWeekPreset(1)}>
+            Last week
+          </Button>
           <Button variant="outline" size="sm" onClick={() => applyMonthPreset(0)}>
             This month
           </Button>

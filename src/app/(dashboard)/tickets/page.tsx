@@ -23,6 +23,7 @@ import { buildSortHref, type SortDir } from "@/lib/sort-link";
 import { PaginationControls } from "@/components/pagination-controls";
 import { PageSizeSelect } from "@/components/page-size-select";
 import { PAGE_SIZE_OPTIONS, DEFAULT_PAGE_SIZE } from "@/lib/page-size";
+import { DashboardDateFilter, type DateField } from "../dashboard/date-filter";
 
 const SORT_COLUMNS = {
   title: { column: tickets.title, defaultDir: "asc" as SortDir },
@@ -63,10 +64,14 @@ export default async function TicketsPage({
     pageSize?: string;
     sort?: string;
     dir?: string;
+    from?: string;
+    to?: string;
+    field?: string;
   }>;
 }) {
   const params = await searchParams;
   const currentUser = await getCurrentUser();
+  const dateField: DateField = params.field === "updated" ? "updated" : "created";
   const page = Math.max(1, Number(params.page) || 1);
   const requestedPageSize = Number(params.pageSize);
   const pageSize = (PAGE_SIZE_OPTIONS as readonly number[]).includes(requestedPageSize)
@@ -119,16 +124,19 @@ export default async function TicketsPage({
         </div>
       </div>
 
-      <TicketFilters
-        q={params.q}
-        company={params.company}
-        status={params.status}
-        system={params.system}
-        issueType={params.issue_type}
-        dev={params.dev}
-        systems={systems}
-        devs={devs}
-      />
+      <div className="flex flex-wrap items-end gap-2">
+        <TicketFilters
+          q={params.q}
+          company={params.company}
+          status={params.status}
+          system={params.system}
+          issueType={params.issue_type}
+          dev={params.dev}
+          systems={systems}
+          devs={devs}
+        />
+        <DashboardDateFilter from={params.from} to={params.to} field={dateField} />
+      </div>
 
       {params.recurring === "1" && (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -149,6 +157,9 @@ export default async function TicketsPage({
             issue_type: params.issue_type,
             dev: params.dev,
             recurring: params.recurring,
+            from: params.from,
+            to: params.to,
+            field: params.field,
           }}
         />
         <PageSizeSelect pageSize={pageSize} />

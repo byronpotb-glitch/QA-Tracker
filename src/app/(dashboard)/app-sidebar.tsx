@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboardIcon,
+  FileTextIcon,
   TicketIcon,
   UsersIcon,
   UserCogIcon,
@@ -39,6 +40,7 @@ const PROFILE_ITEM: NavItem = { href: "/profile", label: "Profile", icon: UserCi
 
 const NAV_ITEMS: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboardIcon },
+  { href: "/summary", label: "Summary", icon: FileTextIcon },
   { href: "/projects", label: "Projects", icon: FolderKanbanIcon, adminOnly: true },
   {
     href: "/tickets",
